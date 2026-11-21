@@ -22,6 +22,9 @@ caseUpdate:
   - addUpdate:
   - changeStage:
   - listUpdates:
+dev:
+  - promoteToLawyer:
+  - seedDemoData:
 greeting:
   - hello:
 profile:

@@ -21,6 +21,7 @@ import '../auth/email_idp_endpoint.dart' as _iuc1hd5t;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../cases/case_endpoint.dart' as _iv5lencg;
 import '../cases/case_update_endpoint.dart' as _i4to6n7i;
+import '../dev/dev_endpoint.dart' as _ifx9z153;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
 import '../profile/profile_endpoint.dart' as _i6ky944g;
 
@@ -59,6 +60,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'caseUpdate',
+          null,
+        ),
+      'dev': _ifx9z153.DevEndpoint()
+        ..initialize(
+          server,
+          'dev',
           null,
         ),
       'greeting': _il624ik7.GreetingEndpoint()
@@ -546,6 +553,56 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         params['caseId'],
                       ),
+        ),
+      },
+    );
+    connectors['dev'] = _is.EndpointConnector(
+      name: 'dev',
+      endpoint: endpoints['dev']!,
+      methodConnectors: {
+        'promoteToLawyer': _is.MethodConnector(
+          name: 'promoteToLawyer',
+          params: {
+            'email': _is.ParameterDescription(
+              name: 'email',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['dev'] as _ifx9z153.DevEndpoint).promoteToLawyer(
+                    session,
+                    params['email'],
+                  ),
+        ),
+        'seedDemoData': _is.MethodConnector(
+          name: 'seedDemoData',
+          params: {
+            'citizenEmail': _is.ParameterDescription(
+              name: 'citizenEmail',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'lawyerEmail': _is.ParameterDescription(
+              name: 'lawyerEmail',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['dev'] as _ifx9z153.DevEndpoint).seedDemoData(
+                    session,
+                    params['citizenEmail'],
+                    params['lawyerEmail'],
+                  ),
         ),
       },
     );

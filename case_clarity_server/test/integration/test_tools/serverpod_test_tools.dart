@@ -169,6 +169,8 @@ class TestEndpoints {
 
   late final _CaseUpdateEndpoint caseUpdate;
 
+  late final _DevEndpoint dev;
+
   late final _GreetingEndpoint greeting;
 
   late final _ProfileEndpoint profile;
@@ -194,6 +196,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     caseUpdate = _CaseUpdateEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    dev = _DevEndpoint(
       endpoints,
       serializationManager,
     );
@@ -910,6 +916,83 @@ class _CaseUpdateEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<List<_i6d219a5.CaseUpdate>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _DevEndpoint {
+  _DevEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_ic74p3j2.CaseClarityUserProfile> promoteToLawyer(
+    _ist.TestSessionBuilder sessionBuilder,
+    String email,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dev',
+            method: 'promoteToLawyer',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dev',
+          methodName: 'promoteToLawyer',
+          parameters: _ist.testObjectToJson({'email': email}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ic74p3j2.CaseClarityUserProfile>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_ih17r1z6.LegalCase> seedDemoData(
+    _ist.TestSessionBuilder sessionBuilder,
+    String citizenEmail,
+    String lawyerEmail,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dev',
+            method: 'seedDemoData',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dev',
+          methodName: 'seedDemoData',
+          parameters: _ist.testObjectToJson({
+            'citizenEmail': citizenEmail,
+            'lawyerEmail': lawyerEmail,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ih17r1z6.LegalCase>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

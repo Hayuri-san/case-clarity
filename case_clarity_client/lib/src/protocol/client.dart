@@ -444,6 +444,33 @@ class EndpointCaseUpdate extends _isc.EndpointRef {
       );
 }
 
+/// {@category Endpoint}
+class EndpointDev extends _isc.EndpointRef {
+  EndpointDev(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'dev';
+
+  _ida.Future<_itm3avdn.CaseClarityUserProfile> promoteToLawyer(String email) =>
+      caller.callServerEndpoint<_itm3avdn.CaseClarityUserProfile>(
+        'dev',
+        'promoteToLawyer',
+        {'email': email},
+      );
+
+  _ida.Future<_ikj33umw.LegalCase> seedDemoData(
+    String citizenEmail,
+    String lawyerEmail,
+  ) => caller.callServerEndpoint<_ikj33umw.LegalCase>(
+    'dev',
+    'seedDemoData',
+    {
+      'citizenEmail': citizenEmail,
+      'lawyerEmail': lawyerEmail,
+    },
+  );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -527,6 +554,7 @@ class Client extends _isc.ServerpodClientShared {
     jwtRefresh = EndpointJwtRefresh(this);
     cases = EndpointCases(this);
     caseUpdate = EndpointCaseUpdate(this);
+    dev = EndpointDev(this);
     greeting = EndpointGreeting(this);
     profile = EndpointProfile(this);
     modules = Modules(this);
@@ -540,6 +568,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointCaseUpdate caseUpdate;
 
+  late final EndpointDev dev;
+
   late final EndpointGreeting greeting;
 
   late final EndpointProfile profile;
@@ -552,6 +582,7 @@ class Client extends _isc.ServerpodClientShared {
     'jwtRefresh': jwtRefresh,
     'cases': cases,
     'caseUpdate': caseUpdate,
+    'dev': dev,
     'greeting': greeting,
     'profile': profile,
   };

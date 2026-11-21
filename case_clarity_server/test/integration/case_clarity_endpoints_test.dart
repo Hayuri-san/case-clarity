@@ -46,9 +46,48 @@ void main() {
         authentication: AuthenticationOverride.unauthenticated(),
       );
 
-      await expectLater(
-        endpoints.profile.getMyProfile(anonymous),
-        throwsA(isA<ServerpodUnauthenticatedException>()),
+      final protectedCalls = <Future<dynamic> Function()>[
+        () => endpoints.profile.getMyProfile(anonymous),
+        () => endpoints.profile.createOrUpdateMyProfile(anonymous, 'Anonymous'),
+        () => endpoints.cases.createCase(
+          anonymous,
+          'Anonymous case',
+          CaseType.other,
+          '',
+        ),
+        () => endpoints.cases.listMyCases(anonymous),
+        () => endpoints.cases.getCase(anonymous, 1),
+        () => endpoints.cases.updateCaseInfo(anonymous, 1, 'Title', ''),
+        () => endpoints.caseUpdate.addUpdate(anonymous, 1, 'Title', ''),
+        () => endpoints.caseUpdate.changeStage(
+          anonymous,
+          1,
+          CaseStage.inProgress,
+        ),
+        () => endpoints.caseUpdate.listUpdates(anonymous, 1),
+      ];
+
+      for (final call in protectedCalls) {
+        await expectLater(
+          call(),
+          throwsA(isA<ServerpodUnauthenticatedException>()),
+        );
+      }
+    });
+
+    test('when development endpoints run outside development then all calls are rejected', () async {
+      final anonymous = sessionBuilder.copyWith(
+        authentication: AuthenticationOverride.unauthenticated(),
+      );
+      await expectRejected(
+        endpoints.dev.promoteToLawyer(anonymous, 'lawyer@example.com'),
+      );
+      await expectRejected(
+        endpoints.dev.seedDemoData(
+          anonymous,
+          'citizen@example.com',
+          'lawyer@example.com',
+        ),
       );
     });
 
@@ -112,7 +151,7 @@ void main() {
       expect(aliceCases.single.id, created.id);
     });
 
-    test('when unrelated users or the case citizen post then case access is rejected', () async {
+    test('when unrelated citizens and lawyers or the case citizen post then case access is rejected', () async {
       final citizen = asUser(
         sessionBuilder,
         '30000000-0000-4000-8000-000000000001',
@@ -254,9 +293,71 @@ void main() {
         'Lawyer update',
         'Stage changed to In Progress',
       ]);
+      expect(updates.last.kind, CaseUpdateKind.stageChange);
+      expect(updates.last.authorId, lawyerProfile.userId);
       expect(updates.map((update) => update.createdAt), orderedEquals(
         updates.map((update) => update.createdAt).toList()..sort(),
       ));
+    });
+
+    test('when the creating citizen updates case info then stage and assignment stay unchanged', () async {
+      final citizen = asUser(
+        sessionBuilder,
+        '50000000-0000-4000-8000-000000000001',
+      );
+      final lawyer = asUser(
+        sessionBuilder,
+        '50000000-0000-4000-8000-000000000002',
+      );
+      final otherCitizen = asUser(
+        sessionBuilder,
+        '50000000-0000-4000-8000-000000000003',
+      );
+      await createProfile(endpoints, citizen, 'Creating Citizen');
+      final lawyerProfile = await createLawyerProfile(endpoints, lawyer, 'Lawyer');
+      await createProfile(endpoints, otherCitizen, 'Other Citizen');
+
+      final created = await endpoints.cases.createCase(
+        citizen,
+        'Original title',
+        CaseType.other,
+        'Original description',
+      );
+      await LegalCase.db.updateRow(
+        sessionBuilder.build(),
+        created.copyWith(
+          assignedLawyerId: lawyerProfile.userId,
+          stage: CaseStage.awaitingDocuments,
+        ),
+      );
+
+      final updated = await endpoints.cases.updateCaseInfo(
+        citizen,
+        created.id!,
+        'Revised title',
+        'Revised description',
+      );
+      expect(updated.title, 'Revised title');
+      expect(updated.description, 'Revised description');
+      expect(updated.stage, CaseStage.awaitingDocuments);
+      expect(updated.assignedLawyerId, lawyerProfile.userId);
+
+      await expectRejected(
+        endpoints.cases.updateCaseInfo(
+          lawyer,
+          created.id!,
+          'Lawyer title',
+          'Description',
+        ),
+      );
+      await expectRejected(
+        endpoints.cases.updateCaseInfo(
+          otherCitizen,
+          created.id!,
+          'Other title',
+          'Description',
+        ),
+      );
     });
   });
 }
