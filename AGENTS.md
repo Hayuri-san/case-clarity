@@ -49,3 +49,25 @@ If the user asks you to test the app:
 The app is launched from `case_clarity_flutter/lib/driver.dart`, which starts the Flutter driver extension with text entry emulation turned off so the app stays usable by hand. To let the driver type, set `enableTextEntryEmulation: true` there and `hot_restart` the app.
 
 IMPORTANT: After building the first version of the app, update this AGENTS.md file with information about the app we're building. KEEP the info about the MCP server and the checklist. Remove this paragraph.
+
+# Case Clarity project rules
+## Product
+Case Clarity helps Indian citizens understand legal problems (cheque bounce, consumer complaint, cyber fraud) and connects them with a lawyer. Two roles, ONE backend, role-based access.
+- Citizen: signs in, reads legal guides, creates cases, uploads legal notices (OCR), confirms dates, sees deadlines, tracks the case timeline.
+- Lawyer: signs in, sees assigned cases, views documents and extracted text, changes case stage, posts updates the citizen can see.
+
+## Environment
+Windows 11, VS Code, PowerShell. Never run commands that block (serverpod start); ask me to run them.
+
+## Stack (mandatory)
+Flutter/Dart (Riverpod on the frontend), Serverpod 4, PostgreSQL (embedded in development; do NOT install Postgres or Docker), Serverpod Cloud for deployment. Installed: Flutter 3.50.1, Dart 3.14.0, Serverpod 4.1.2. Follow https://docs.serverpod.dev for every command and API. Never invent commands, package names or APIs; if unsure, check the docs or tell me.
+
+## Project rules
+- Inspect the real generated project first and do not restructure it. Add my own files only in server/lib/src/models (.spy.yaml), endpoints, and services. Planned: user_profile, legal_case, case_update, case_document, legal_guide models; profile, case, case_update, document, legal_guide endpoints; ocr_service.dart and deadline_service.dart.
+- Never hand-edit generated/ code or the client package. After a model change: create and apply the migration (M in the serverpod start terminal) and make sure the client regenerates.
+- Authorization is enforced on the SERVER in every endpoint, via ONE shared helper. For cases, return the same error for "not found" and "not allowed".
+- Roles: citizen, lawyer. Case stages: underReview, inProgress, awaitingDocuments, resolved. Case types: chequeBounce, consumerComplaint, cyberFraud, other. Use enums in .spy.yaml.
+- Secrets live only in config/passwords.yaml or Serverpod Cloud secrets, never in code, prompts, logs or Git. Never log document text.
+- Validate input and return clear errors. Write tests for every feature with Serverpod's test tooling, including "user A cannot touch user B's data".
+- After each phase, update docs/API.md for my teammate: endpoint, parameters, return type, who may call it, errors.
+- Keep it small. After each phase: explain every file changed, tell me exactly how to test it, then STOP.
