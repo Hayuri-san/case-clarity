@@ -1,0 +1,11 @@
+name: _
+publish_to: none
+
+environment:
+  sdk: '^3.12.2'
+
+workspace:
+  - case_clarity_client
+  - case_clarity_server
+  - case_clarity_flutter
+
