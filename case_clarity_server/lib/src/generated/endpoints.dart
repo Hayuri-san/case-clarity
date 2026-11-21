@@ -21,8 +21,10 @@ import '../auth/email_idp_endpoint.dart' as _iuc1hd5t;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../cases/case_endpoint.dart' as _iv5lencg;
 import '../cases/case_update_endpoint.dart' as _i4to6n7i;
+import '../deadlines/deadline_endpoint.dart' as _i8oq584x;
 import '../dev/dev_endpoint.dart' as _ifx9z153;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
+import '../guides/legal_guide_endpoint.dart' as _ici4s7b9;
 import '../profile/profile_endpoint.dart' as _i6ky944g;
 
 class Endpoints extends _is.EndpointDispatch {
@@ -62,6 +64,12 @@ class Endpoints extends _is.EndpointDispatch {
           'caseUpdate',
           null,
         ),
+      'deadline': _i8oq584x.DeadlineEndpoint()
+        ..initialize(
+          server,
+          'deadline',
+          null,
+        ),
       'dev': _ifx9z153.DevEndpoint()
         ..initialize(
           server,
@@ -72,6 +80,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'greeting',
+          null,
+        ),
+      'legalGuide': _ici4s7b9.LegalGuideEndpoint()
+        ..initialize(
+          server,
+          'legalGuide',
           null,
         ),
       'profile': _i6ky944g.ProfileEndpoint()
@@ -556,6 +570,61 @@ class Endpoints extends _is.EndpointDispatch {
         ),
       },
     );
+    connectors['deadline'] = _is.EndpointConnector(
+      name: 'deadline',
+      endpoint: endpoints['deadline']!,
+      methodConnectors: {
+        'calculateSection138': _is.MethodConnector(
+          name: 'calculateSection138',
+          params: {
+            'chequeDate': _is.ParameterDescription(
+              name: 'chequeDate',
+              type: _is.getType<DateTime>(),
+              nullable: false,
+            ),
+            'chequePresentedDate': _is.ParameterDescription(
+              name: 'chequePresentedDate',
+              type: _is.getType<DateTime>(),
+              nullable: false,
+            ),
+            'dishonourIntimationDate': _is.ParameterDescription(
+              name: 'dishonourIntimationDate',
+              type: _is.getType<DateTime>(),
+              nullable: false,
+            ),
+            'chequeValidityDate': _is.ParameterDescription(
+              name: 'chequeValidityDate',
+              type: _is.getType<DateTime?>(),
+              nullable: true,
+            ),
+            'noticeSentDate': _is.ParameterDescription(
+              name: 'noticeSentDate',
+              type: _is.getType<DateTime?>(),
+              nullable: true,
+            ),
+            'noticeReceivedDate': _is.ParameterDescription(
+              name: 'noticeReceivedDate',
+              type: _is.getType<DateTime?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['deadline'] as _i8oq584x.DeadlineEndpoint)
+                  .calculateSection138(
+                    session,
+                    chequeDate: params['chequeDate'],
+                    chequePresentedDate: params['chequePresentedDate'],
+                    dishonourIntimationDate: params['dishonourIntimationDate'],
+                    chequeValidityDate: params['chequeValidityDate'],
+                    noticeSentDate: params['noticeSentDate'],
+                    noticeReceivedDate: params['noticeReceivedDate'],
+                  ),
+        ),
+      },
+    );
     connectors['dev'] = _is.EndpointConnector(
       name: 'dev',
       endpoint: endpoints['dev']!,
@@ -628,6 +697,43 @@ class Endpoints extends _is.EndpointDispatch {
                     session,
                     params['name'],
                   ),
+        ),
+      },
+    );
+    connectors['legalGuide'] = _is.EndpointConnector(
+      name: 'legalGuide',
+      endpoint: endpoints['legalGuide']!,
+      methodConnectors: {
+        'listGuides': _is.MethodConnector(
+          name: 'listGuides',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['legalGuide'] as _ici4s7b9.LegalGuideEndpoint)
+                      .listGuides(session),
+        ),
+        'getGuide': _is.MethodConnector(
+          name: 'getGuide',
+          params: {
+            'slug': _is.ParameterDescription(
+              name: 'slug',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['legalGuide'] as _ici4s7b9.LegalGuideEndpoint)
+                      .getGuide(
+                        session,
+                        params['slug'],
+                      ),
         ),
       },
     );

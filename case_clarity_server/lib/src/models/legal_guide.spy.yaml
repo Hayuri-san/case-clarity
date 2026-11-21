@@ -1,0 +1,17 @@
+class: LegalGuide
+table: legal_guide
+fields:
+  slug: String
+  title: String
+  caseType: CaseType
+  summary: String
+  steps: List<String>
+  relevantSections: List<String>
+  disclaimer: String
+  sortOrder: int
+indexes:
+  legal_guide_slug_idx:
+    fields: slug
+    unique: true
+  legal_guide_sort_order_idx:
+    fields: sortOrder

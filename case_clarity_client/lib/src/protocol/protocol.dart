@@ -13,6 +13,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:case_clarity_client/src/protocol/case_update.dart' as _id85u6x2;
 import 'package:case_clarity_client/src/protocol/legal_case.dart' as _ikj33umw;
+import 'package:case_clarity_client/src/protocol/legal_guide.dart' as _iob8qfja;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
@@ -23,16 +24,24 @@ import 'case_stage.dart' as _if5glxvh;
 import 'case_type.dart' as _igfaebu4;
 import 'case_update.dart' as _idl61rz9;
 import 'case_update_kind.dart' as _ibzvjs03;
+import 'deadline_item.dart' as _ith1d9x5;
+import 'deadline_status.dart' as _i9rknlqw;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'legal_case.dart' as _ii7rdblg;
+import 'legal_guide.dart' as _iqo2rnry;
+import 'section138_deadline_result.dart' as _iho072sf;
 import 'user_role.dart' as _ir0y0iu6;
 export 'case_clarity_user_profile.dart';
 export 'case_stage.dart';
 export 'case_type.dart';
 export 'case_update.dart';
 export 'case_update_kind.dart';
+export 'deadline_item.dart';
+export 'deadline_status.dart';
 export 'greetings/greeting.dart';
 export 'legal_case.dart';
+export 'legal_guide.dart';
+export 'section138_deadline_result.dart';
 export 'user_role.dart';
 export 'client.dart';
 
@@ -54,19 +63,30 @@ class Protocol extends _isc.SerializationManager
           _isc.getType<_igfaebu4.CaseType>,
           _isc.getType<_idl61rz9.CaseUpdate>,
           _isc.getType<_ibzvjs03.CaseUpdateKind>,
+          _isc.getType<_ith1d9x5.DeadlineItem>,
+          _isc.getType<_i9rknlqw.DeadlineStatus>,
           _isc.getType<_izw8z7ou.Greeting>,
           _isc.getType<_ii7rdblg.LegalCase>,
+          _isc.getType<_iqo2rnry.LegalGuide>,
+          _isc.getType<_iho072sf.Section138DeadlineResult>,
           _isc.getType<_ir0y0iu6.UserRole>,
           _isc.getType<_ijms5s6d.CaseClarityUserProfile?>,
           _isc.getType<_if5glxvh.CaseStage?>,
           _isc.getType<_igfaebu4.CaseType?>,
           _isc.getType<_idl61rz9.CaseUpdate?>,
           _isc.getType<_ibzvjs03.CaseUpdateKind?>,
+          _isc.getType<_ith1d9x5.DeadlineItem?>,
+          _isc.getType<_i9rknlqw.DeadlineStatus?>,
           _isc.getType<_izw8z7ou.Greeting?>,
           _isc.getType<_ii7rdblg.LegalCase?>,
+          _isc.getType<_iqo2rnry.LegalGuide?>,
+          _isc.getType<_iho072sf.Section138DeadlineResult?>,
           _isc.getType<_ir0y0iu6.UserRole?>,
+          _isc.getType<List<String>>,
+          _isc.getType<List<_ith1d9x5.DeadlineItem>>,
           _isc.getType<List<_ikj33umw.LegalCase>>,
           _isc.getType<List<_id85u6x2.CaseUpdate>>,
+          _isc.getType<List<_iob8qfja.LegalGuide>>,
         ],
         modules: const [
           _iaic.Protocol.new,
@@ -78,8 +98,12 @@ class Protocol extends _isc.SerializationManager
           'CaseType',
           'CaseUpdate',
           'CaseUpdateKind',
+          'DeadlineItem',
+          'DeadlineStatus',
           'Greeting',
           'LegalCase',
+          'LegalGuide',
+          'Section138DeadlineResult',
           'UserRole',
         ],
       );
@@ -123,11 +147,23 @@ class Protocol extends _isc.SerializationManager
     if (t == _ibzvjs03.CaseUpdateKind) {
       return _ibzvjs03.CaseUpdateKind.fromJson(data) as T;
     }
+    if (t == _ith1d9x5.DeadlineItem) {
+      return _ith1d9x5.DeadlineItem.fromJson(data) as T;
+    }
+    if (t == _i9rknlqw.DeadlineStatus) {
+      return _i9rknlqw.DeadlineStatus.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
     if (t == _ii7rdblg.LegalCase) {
       return _ii7rdblg.LegalCase.fromJson(data) as T;
+    }
+    if (t == _iqo2rnry.LegalGuide) {
+      return _iqo2rnry.LegalGuide.fromJson(data) as T;
+    }
+    if (t == _iho072sf.Section138DeadlineResult) {
+      return _iho072sf.Section138DeadlineResult.fromJson(data) as T;
     }
     if (t == _ir0y0iu6.UserRole) {
       return _ir0y0iu6.UserRole.fromJson(data) as T;
@@ -151,14 +187,39 @@ class Protocol extends _isc.SerializationManager
       return (data != null ? _ibzvjs03.CaseUpdateKind.fromJson(data) : null)
           as T;
     }
+    if (t == _isc.getType<_ith1d9x5.DeadlineItem?>()) {
+      return (data != null ? _ith1d9x5.DeadlineItem.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_i9rknlqw.DeadlineStatus?>()) {
+      return (data != null ? _i9rknlqw.DeadlineStatus.fromJson(data) : null)
+          as T;
+    }
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
     }
     if (t == _isc.getType<_ii7rdblg.LegalCase?>()) {
       return (data != null ? _ii7rdblg.LegalCase.fromJson(data) : null) as T;
     }
+    if (t == _isc.getType<_iqo2rnry.LegalGuide?>()) {
+      return (data != null ? _iqo2rnry.LegalGuide.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_iho072sf.Section138DeadlineResult?>()) {
+      return (data != null
+              ? _iho072sf.Section138DeadlineResult.fromJson(data)
+              : null)
+          as T;
+    }
     if (t == _isc.getType<_ir0y0iu6.UserRole?>()) {
       return (data != null ? _ir0y0iu6.UserRole.fromJson(data) : null) as T;
+    }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == List<_ith1d9x5.DeadlineItem>) {
+      return (data as List)
+              .map((e) => deserialize<_ith1d9x5.DeadlineItem>(e))
+              .toList()
+          as T;
     }
     if (t == List<_ikj33umw.LegalCase>) {
       return (data as List)
@@ -169,6 +230,12 @@ class Protocol extends _isc.SerializationManager
     if (t == List<_id85u6x2.CaseUpdate>) {
       return (data as List)
               .map((e) => deserialize<_id85u6x2.CaseUpdate>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_iob8qfja.LegalGuide>) {
+      return (data as List)
+              .map((e) => deserialize<_iob8qfja.LegalGuide>(e))
               .toList()
           as T;
     }
@@ -192,8 +259,12 @@ class Protocol extends _isc.SerializationManager
       _igfaebu4.CaseType => 'CaseType',
       _idl61rz9.CaseUpdate => 'CaseUpdate',
       _ibzvjs03.CaseUpdateKind => 'CaseUpdateKind',
+      _ith1d9x5.DeadlineItem => 'DeadlineItem',
+      _i9rknlqw.DeadlineStatus => 'DeadlineStatus',
       _izw8z7ou.Greeting => 'Greeting',
       _ii7rdblg.LegalCase => 'LegalCase',
+      _iqo2rnry.LegalGuide => 'LegalGuide',
+      _iho072sf.Section138DeadlineResult => 'Section138DeadlineResult',
       _ir0y0iu6.UserRole => 'UserRole',
       _ => null,
     };
@@ -222,10 +293,18 @@ class Protocol extends _isc.SerializationManager
         return 'CaseUpdate';
       case _ibzvjs03.CaseUpdateKind():
         return 'CaseUpdateKind';
+      case _ith1d9x5.DeadlineItem():
+        return 'DeadlineItem';
+      case _i9rknlqw.DeadlineStatus():
+        return 'DeadlineStatus';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _ii7rdblg.LegalCase():
         return 'LegalCase';
+      case _iqo2rnry.LegalGuide():
+        return 'LegalGuide';
+      case _iho072sf.Section138DeadlineResult():
+        return 'Section138DeadlineResult';
       case _ir0y0iu6.UserRole():
         return 'UserRole';
     }
@@ -265,11 +344,23 @@ class Protocol extends _isc.SerializationManager
     if (dataClassName == 'CaseUpdateKind') {
       return deserialize<_ibzvjs03.CaseUpdateKind>(data['data']);
     }
+    if (dataClassName == 'DeadlineItem') {
+      return deserialize<_ith1d9x5.DeadlineItem>(data['data']);
+    }
+    if (dataClassName == 'DeadlineStatus') {
+      return deserialize<_i9rknlqw.DeadlineStatus>(data['data']);
+    }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
     }
     if (dataClassName == 'LegalCase') {
       return deserialize<_ii7rdblg.LegalCase>(data['data']);
+    }
+    if (dataClassName == 'LegalGuide') {
+      return deserialize<_iqo2rnry.LegalGuide>(data['data']);
+    }
+    if (dataClassName == 'Section138DeadlineResult') {
+      return deserialize<_iho072sf.Section138DeadlineResult>(data['data']);
     }
     if (dataClassName == 'UserRole') {
       return deserialize<_ir0y0iu6.UserRole>(data['data']);

@@ -6,6 +6,7 @@ import 'package:serverpod_cloud_storage/serverpod_cloud_storage.dart';
 
 import 'src/cache_busting.dart';
 import 'src/generated/serverpod.dart';
+import 'src/services/legal_guide_seed.dart';
 import 'src/web/routes/app_config_route.dart';
 
 /// The starting point of the Serverpod server.
@@ -102,4 +103,5 @@ void run(List<String> args) async {
 
   // Start the server.
   await pod.start();
+  await pod.withSession(seedLegalGuides);
 }

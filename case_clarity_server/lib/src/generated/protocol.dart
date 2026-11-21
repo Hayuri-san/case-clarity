@@ -14,6 +14,8 @@
 import 'package:case_clarity_server/src/generated/case_update.dart'
     as _i6d219a5;
 import 'package:case_clarity_server/src/generated/legal_case.dart' as _ih17r1z6;
+import 'package:case_clarity_server/src/generated/legal_guide.dart'
+    as _ir6mm7hc;
 import 'package:serverpod/protocol.dart' as _isp;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
@@ -25,16 +27,24 @@ import 'case_stage.dart' as _if5glxvh;
 import 'case_type.dart' as _igfaebu4;
 import 'case_update.dart' as _idl61rz9;
 import 'case_update_kind.dart' as _ibzvjs03;
+import 'deadline_item.dart' as _ith1d9x5;
+import 'deadline_status.dart' as _i9rknlqw;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'legal_case.dart' as _ii7rdblg;
+import 'legal_guide.dart' as _iqo2rnry;
+import 'section138_deadline_result.dart' as _iho072sf;
 import 'user_role.dart' as _ir0y0iu6;
 export 'case_clarity_user_profile.dart';
 export 'case_stage.dart';
 export 'case_type.dart';
 export 'case_update.dart';
 export 'case_update_kind.dart';
+export 'deadline_item.dart';
+export 'deadline_status.dart';
 export 'greetings/greeting.dart';
 export 'legal_case.dart';
+export 'legal_guide.dart';
+export 'section138_deadline_result.dart';
 export 'user_role.dart';
 
 class Protocol extends _is.DatabaseSerializationManager
@@ -55,19 +65,30 @@ class Protocol extends _is.DatabaseSerializationManager
           _is.getType<_igfaebu4.CaseType>,
           _is.getType<_idl61rz9.CaseUpdate>,
           _is.getType<_ibzvjs03.CaseUpdateKind>,
+          _is.getType<_ith1d9x5.DeadlineItem>,
+          _is.getType<_i9rknlqw.DeadlineStatus>,
           _is.getType<_izw8z7ou.Greeting>,
           _is.getType<_ii7rdblg.LegalCase>,
+          _is.getType<_iqo2rnry.LegalGuide>,
+          _is.getType<_iho072sf.Section138DeadlineResult>,
           _is.getType<_ir0y0iu6.UserRole>,
           _is.getType<_ijms5s6d.CaseClarityUserProfile?>,
           _is.getType<_if5glxvh.CaseStage?>,
           _is.getType<_igfaebu4.CaseType?>,
           _is.getType<_idl61rz9.CaseUpdate?>,
           _is.getType<_ibzvjs03.CaseUpdateKind?>,
+          _is.getType<_ith1d9x5.DeadlineItem?>,
+          _is.getType<_i9rknlqw.DeadlineStatus?>,
           _is.getType<_izw8z7ou.Greeting?>,
           _is.getType<_ii7rdblg.LegalCase?>,
+          _is.getType<_iqo2rnry.LegalGuide?>,
+          _is.getType<_iho072sf.Section138DeadlineResult?>,
           _is.getType<_ir0y0iu6.UserRole?>,
+          _is.getType<List<String>>,
+          _is.getType<List<_ith1d9x5.DeadlineItem>>,
           _is.getType<List<_ih17r1z6.LegalCase>>,
           _is.getType<List<_i6d219a5.CaseUpdate>>,
+          _is.getType<List<_ir6mm7hc.LegalGuide>>,
         ],
         modules: const [
           _iais.Protocol.new,
@@ -80,8 +101,12 @@ class Protocol extends _is.DatabaseSerializationManager
           'CaseType',
           'CaseUpdate',
           'CaseUpdateKind',
+          'DeadlineItem',
+          'DeadlineStatus',
           'Greeting',
           'LegalCase',
+          'LegalGuide',
+          'Section138DeadlineResult',
           'UserRole',
         ],
       );
@@ -327,6 +352,99 @@ class Protocol extends _is.DatabaseSerializationManager
       ],
       managed: true,
     ),
+    _isp.TableDefinition(
+      name: 'legal_guide',
+      dartName: 'LegalGuide',
+      schema: 'public',
+      module: 'case_clarity',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'slug',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'title',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'caseType',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:CaseType',
+        ),
+        _isp.ColumnDefinition(
+          name: 'summary',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'steps',
+          columnType: _isp.ColumnType.json,
+          isNullable: false,
+          dartType: 'List<String>',
+        ),
+        _isp.ColumnDefinition(
+          name: 'relevantSections',
+          columnType: _isp.ColumnType.json,
+          isNullable: false,
+          dartType: 'List<String>',
+        ),
+        _isp.ColumnDefinition(
+          name: 'disclaimer',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'sortOrder',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'legal_guide_slug_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'slug',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'legal_guide_sort_order_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'sortOrder',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
   ];
 
   static String? getClassNameFromObjectJson(dynamic data) =>
@@ -368,11 +486,23 @@ class Protocol extends _is.DatabaseSerializationManager
     if (t == _ibzvjs03.CaseUpdateKind) {
       return _ibzvjs03.CaseUpdateKind.fromJson(data) as T;
     }
+    if (t == _ith1d9x5.DeadlineItem) {
+      return _ith1d9x5.DeadlineItem.fromJson(data) as T;
+    }
+    if (t == _i9rknlqw.DeadlineStatus) {
+      return _i9rknlqw.DeadlineStatus.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
     if (t == _ii7rdblg.LegalCase) {
       return _ii7rdblg.LegalCase.fromJson(data) as T;
+    }
+    if (t == _iqo2rnry.LegalGuide) {
+      return _iqo2rnry.LegalGuide.fromJson(data) as T;
+    }
+    if (t == _iho072sf.Section138DeadlineResult) {
+      return _iho072sf.Section138DeadlineResult.fromJson(data) as T;
     }
     if (t == _ir0y0iu6.UserRole) {
       return _ir0y0iu6.UserRole.fromJson(data) as T;
@@ -396,14 +526,39 @@ class Protocol extends _is.DatabaseSerializationManager
       return (data != null ? _ibzvjs03.CaseUpdateKind.fromJson(data) : null)
           as T;
     }
+    if (t == _is.getType<_ith1d9x5.DeadlineItem?>()) {
+      return (data != null ? _ith1d9x5.DeadlineItem.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i9rknlqw.DeadlineStatus?>()) {
+      return (data != null ? _i9rknlqw.DeadlineStatus.fromJson(data) : null)
+          as T;
+    }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_ii7rdblg.LegalCase?>()) {
       return (data != null ? _ii7rdblg.LegalCase.fromJson(data) : null) as T;
     }
+    if (t == _is.getType<_iqo2rnry.LegalGuide?>()) {
+      return (data != null ? _iqo2rnry.LegalGuide.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_iho072sf.Section138DeadlineResult?>()) {
+      return (data != null
+              ? _iho072sf.Section138DeadlineResult.fromJson(data)
+              : null)
+          as T;
+    }
     if (t == _is.getType<_ir0y0iu6.UserRole?>()) {
       return (data != null ? _ir0y0iu6.UserRole.fromJson(data) : null) as T;
+    }
+    if (t == List<String>) {
+      return (data as List).map((e) => deserialize<String>(e)).toList() as T;
+    }
+    if (t == List<_ith1d9x5.DeadlineItem>) {
+      return (data as List)
+              .map((e) => deserialize<_ith1d9x5.DeadlineItem>(e))
+              .toList()
+          as T;
     }
     if (t == List<_ih17r1z6.LegalCase>) {
       return (data as List)
@@ -414,6 +569,12 @@ class Protocol extends _is.DatabaseSerializationManager
     if (t == List<_i6d219a5.CaseUpdate>) {
       return (data as List)
               .map((e) => deserialize<_i6d219a5.CaseUpdate>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_ir6mm7hc.LegalGuide>) {
+      return (data as List)
+              .map((e) => deserialize<_ir6mm7hc.LegalGuide>(e))
               .toList()
           as T;
     }
@@ -437,8 +598,12 @@ class Protocol extends _is.DatabaseSerializationManager
       _igfaebu4.CaseType => 'CaseType',
       _idl61rz9.CaseUpdate => 'CaseUpdate',
       _ibzvjs03.CaseUpdateKind => 'CaseUpdateKind',
+      _ith1d9x5.DeadlineItem => 'DeadlineItem',
+      _i9rknlqw.DeadlineStatus => 'DeadlineStatus',
       _izw8z7ou.Greeting => 'Greeting',
       _ii7rdblg.LegalCase => 'LegalCase',
+      _iqo2rnry.LegalGuide => 'LegalGuide',
+      _iho072sf.Section138DeadlineResult => 'Section138DeadlineResult',
       _ir0y0iu6.UserRole => 'UserRole',
       _ => null,
     };
@@ -467,10 +632,18 @@ class Protocol extends _is.DatabaseSerializationManager
         return 'CaseUpdate';
       case _ibzvjs03.CaseUpdateKind():
         return 'CaseUpdateKind';
+      case _ith1d9x5.DeadlineItem():
+        return 'DeadlineItem';
+      case _i9rknlqw.DeadlineStatus():
+        return 'DeadlineStatus';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _ii7rdblg.LegalCase():
         return 'LegalCase';
+      case _iqo2rnry.LegalGuide():
+        return 'LegalGuide';
+      case _iho072sf.Section138DeadlineResult():
+        return 'Section138DeadlineResult';
       case _ir0y0iu6.UserRole():
         return 'UserRole';
     }
@@ -514,11 +687,23 @@ class Protocol extends _is.DatabaseSerializationManager
     if (dataClassName == 'CaseUpdateKind') {
       return deserialize<_ibzvjs03.CaseUpdateKind>(data['data']);
     }
+    if (dataClassName == 'DeadlineItem') {
+      return deserialize<_ith1d9x5.DeadlineItem>(data['data']);
+    }
+    if (dataClassName == 'DeadlineStatus') {
+      return deserialize<_i9rknlqw.DeadlineStatus>(data['data']);
+    }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
     }
     if (dataClassName == 'LegalCase') {
       return deserialize<_ii7rdblg.LegalCase>(data['data']);
+    }
+    if (dataClassName == 'LegalGuide') {
+      return deserialize<_iqo2rnry.LegalGuide>(data['data']);
+    }
+    if (dataClassName == 'Section138DeadlineResult') {
+      return deserialize<_iho072sf.Section138DeadlineResult>(data['data']);
     }
     if (dataClassName == 'UserRole') {
       return deserialize<_ir0y0iu6.UserRole>(data['data']);
@@ -576,6 +761,8 @@ class Protocol extends _is.DatabaseSerializationManager
         return _idl61rz9.CaseUpdate.t;
       case _ii7rdblg.LegalCase:
         return _ii7rdblg.LegalCase.t;
+      case _iqo2rnry.LegalGuide:
+        return _iqo2rnry.LegalGuide.t;
     }
     return null;
   }

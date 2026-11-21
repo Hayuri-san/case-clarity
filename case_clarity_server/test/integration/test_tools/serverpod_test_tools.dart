@@ -22,6 +22,10 @@ import 'package:case_clarity_server/src/generated/case_update.dart'
 import 'package:case_clarity_server/src/generated/greetings/greeting.dart'
     as _igbupn3s;
 import 'package:case_clarity_server/src/generated/legal_case.dart' as _ih17r1z6;
+import 'package:case_clarity_server/src/generated/legal_guide.dart'
+    as _ir6mm7hc;
+import 'package:case_clarity_server/src/generated/section138_deadline_result.dart'
+    as _ifl29il0;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -169,9 +173,13 @@ class TestEndpoints {
 
   late final _CaseUpdateEndpoint caseUpdate;
 
+  late final _DeadlineEndpoint deadline;
+
   late final _DevEndpoint dev;
 
   late final _GreetingEndpoint greeting;
+
+  late final _LegalGuideEndpoint legalGuide;
 
   late final _ProfileEndpoint profile;
 }
@@ -199,11 +207,19 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
+    deadline = _DeadlineEndpoint(
+      endpoints,
+      serializationManager,
+    );
     dev = _DevEndpoint(
       endpoints,
       serializationManager,
     );
     greeting = _GreetingEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    legalGuide = _LegalGuideEndpoint(
       endpoints,
       serializationManager,
     );
@@ -924,6 +940,60 @@ class _CaseUpdateEndpoint {
   }
 }
 
+class _DeadlineEndpoint {
+  _DeadlineEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_ifl29il0.Section138DeadlineResult> calculateSection138(
+    _ist.TestSessionBuilder sessionBuilder, {
+    required DateTime chequeDate,
+    required DateTime chequePresentedDate,
+    required DateTime dishonourIntimationDate,
+    DateTime? chequeValidityDate,
+    DateTime? noticeSentDate,
+    DateTime? noticeReceivedDate,
+  }) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'deadline',
+            method: 'calculateSection138',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'deadline',
+          methodName: 'calculateSection138',
+          parameters: _ist.testObjectToJson({
+            'chequeDate': chequeDate,
+            'chequePresentedDate': chequePresentedDate,
+            'dishonourIntimationDate': dishonourIntimationDate,
+            'chequeValidityDate': chequeValidityDate,
+            'noticeSentDate': noticeSentDate,
+            'noticeReceivedDate': noticeReceivedDate,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ifl29il0.Section138DeadlineResult>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _DevEndpoint {
   _DevEndpoint(
     this._endpointDispatch,
@@ -1035,6 +1105,78 @@ class _GreetingEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<_igbupn3s.Greeting>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _LegalGuideEndpoint {
+  _LegalGuideEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<List<_ir6mm7hc.LegalGuide>> listGuides(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'legalGuide',
+            method: 'listGuides',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'legalGuide',
+          methodName: 'listGuides',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_ir6mm7hc.LegalGuide>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_ir6mm7hc.LegalGuide> getGuide(
+    _ist.TestSessionBuilder sessionBuilder,
+    String slug,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'legalGuide',
+            method: 'getGuide',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'legalGuide',
+          methodName: 'getGuide',
+          parameters: _ist.testObjectToJson({'slug': slug}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ir6mm7hc.LegalGuide>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

@@ -19,6 +19,9 @@ import 'package:case_clarity_client/src/protocol/case_update.dart' as _id85u6x2;
 import 'package:case_clarity_client/src/protocol/greetings/greeting.dart'
     as _idcblnbt;
 import 'package:case_clarity_client/src/protocol/legal_case.dart' as _ikj33umw;
+import 'package:case_clarity_client/src/protocol/legal_guide.dart' as _iob8qfja;
+import 'package:case_clarity_client/src/protocol/section138_deadline_result.dart'
+    as _ioz45in7;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -445,6 +448,34 @@ class EndpointCaseUpdate extends _isc.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointDeadline extends _isc.EndpointRef {
+  EndpointDeadline(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'deadline';
+
+  _ida.Future<_ioz45in7.Section138DeadlineResult> calculateSection138({
+    required DateTime chequeDate,
+    required DateTime chequePresentedDate,
+    required DateTime dishonourIntimationDate,
+    DateTime? chequeValidityDate,
+    DateTime? noticeSentDate,
+    DateTime? noticeReceivedDate,
+  }) => caller.callServerEndpoint<_ioz45in7.Section138DeadlineResult>(
+    'deadline',
+    'calculateSection138',
+    {
+      'chequeDate': chequeDate,
+      'chequePresentedDate': chequePresentedDate,
+      'dishonourIntimationDate': dishonourIntimationDate,
+      'chequeValidityDate': chequeValidityDate,
+      'noticeSentDate': noticeSentDate,
+      'noticeReceivedDate': noticeReceivedDate,
+    },
+  );
+}
+
+/// {@category Endpoint}
 class EndpointDev extends _isc.EndpointRef {
   EndpointDev(_isc.EndpointCaller caller) : super(caller);
 
@@ -486,6 +517,28 @@ class EndpointGreeting extends _isc.EndpointRef {
         'greeting',
         'hello',
         {'name': name},
+      );
+}
+
+/// {@category Endpoint}
+class EndpointLegalGuide extends _isc.EndpointRef {
+  EndpointLegalGuide(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'legalGuide';
+
+  _ida.Future<List<_iob8qfja.LegalGuide>> listGuides() =>
+      caller.callServerEndpoint<List<_iob8qfja.LegalGuide>>(
+        'legalGuide',
+        'listGuides',
+        {},
+      );
+
+  _ida.Future<_iob8qfja.LegalGuide> getGuide(String slug) =>
+      caller.callServerEndpoint<_iob8qfja.LegalGuide>(
+        'legalGuide',
+        'getGuide',
+        {'slug': slug},
       );
 }
 
@@ -554,8 +607,10 @@ class Client extends _isc.ServerpodClientShared {
     jwtRefresh = EndpointJwtRefresh(this);
     cases = EndpointCases(this);
     caseUpdate = EndpointCaseUpdate(this);
+    deadline = EndpointDeadline(this);
     dev = EndpointDev(this);
     greeting = EndpointGreeting(this);
+    legalGuide = EndpointLegalGuide(this);
     profile = EndpointProfile(this);
     modules = Modules(this);
   }
@@ -568,9 +623,13 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointCaseUpdate caseUpdate;
 
+  late final EndpointDeadline deadline;
+
   late final EndpointDev dev;
 
   late final EndpointGreeting greeting;
+
+  late final EndpointLegalGuide legalGuide;
 
   late final EndpointProfile profile;
 
@@ -582,8 +641,10 @@ class Client extends _isc.ServerpodClientShared {
     'jwtRefresh': jwtRefresh,
     'cases': cases,
     'caseUpdate': caseUpdate,
+    'deadline': deadline,
     'dev': dev,
     'greeting': greeting,
+    'legalGuide': legalGuide,
     'profile': profile,
   };
 

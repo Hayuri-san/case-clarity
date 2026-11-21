@@ -1,0 +1,5 @@
+class: Section138DeadlineResult
+fields:
+  items: List<DeadlineItem>
+  assumptions: List<String>
+  disclaimer: String

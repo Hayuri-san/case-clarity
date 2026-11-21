@@ -1,0 +1,6 @@
+class: DeadlineItem
+fields:
+  label: String
+  dueDate: DateTime?
+  basis: String
+  status: DeadlineStatus

@@ -22,11 +22,16 @@ caseUpdate:
   - addUpdate:
   - changeStage:
   - listUpdates:
+deadline:
+  - calculateSection138:
 dev:
   - promoteToLawyer:
   - seedDemoData:
 greeting:
   - hello:
+legalGuide:
+  - listGuides:
+  - getGuide:
 profile:
   - getMyProfile:
   - createOrUpdateMyProfile:

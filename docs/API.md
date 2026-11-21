@@ -21,7 +21,26 @@ that behavior.
 | `caseUpdate.addUpdate` | `caseId: int`, `title: String`, `description: String` | `CaseUpdate` | The case's assigned lawyer | Authentication/profile required; inaccessible cases return `Case not found or access denied.`; title and description limits as above |
 | `caseUpdate.changeStage` | `caseId: int`, `stage: CaseStage` | `LegalCase` | The case's assigned lawyer | Authentication/profile required; inaccessible cases return `Case not found or access denied.`; writes a `stageChange` update entry |
 | `caseUpdate.listUpdates` | `caseId: int` | `List<CaseUpdate>` (oldest first) | Case's creating citizen or assigned lawyer | Authentication/profile required; inaccessible cases return `Case not found or access denied.` |
+| `legalGuide.listGuides` | none | `List<LegalGuide>` sorted by `sortOrder` | Any signed-in user | Authentication required |
+| `legalGuide.getGuide` | `slug: String` | `LegalGuide` | Any signed-in user | Authentication required; `Guide not found.` |
+| `deadline.calculateSection138` | `chequeDate: DateTime`, `chequePresentedDate: DateTime`, `dishonourIntimationDate: DateTime`, optional `chequeValidityDate`, `noticeSentDate`, `noticeReceivedDate` | `Section138DeadlineResult` (`items`, `assumptions`, `disclaimer`) | Any signed-in user | Authentication required; dates must be UTC midnight and in event order |
 | `greeting.hello` | `name: String` | `Greeting` (`message`, `author`, `timestamp`) | Any caller | Standard Serverpod request errors may apply |
+
+`deadline.calculateSection138` returns date-only UTC deadlines for cheque
+presentation, demand notice, the 15-day payment period, and complaint filing.
+The server supplies today's date; clients supply only confirmed event dates.
+An optional shorter cheque validity date can lower the presentation deadline.
+The day of each triggering event is excluded from day counts, month additions
+clamp to month end, and `dueSoon` means today through the next seven days.
+Missing notice receipt leaves the payment and complaint deadlines
+`notYetComputable`. If no notice-sent date is supplied, the 30-day deadline is
+still shown and its basis notes that no notice is recorded. Results include
+the assumptions and disclaimer in the typed return value.
+
+Legal guide content is informational. The cheque guide points readers to the
+Negotiable Instruments Act, 1881, Sections 138 and 142; statutory periods and
+court interpretations can depend on the facts, so users should confirm dates
+with a lawyer.
 
 ## Local development only
 
