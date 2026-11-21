@@ -1,0 +1,6 @@
+enum: CaseType
+values:
+  - chequeBounce
+  - consumerComplaint
+  - cyberFraud
+  - other

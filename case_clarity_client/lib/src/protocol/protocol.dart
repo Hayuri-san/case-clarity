@@ -11,13 +11,29 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:case_clarity_client/src/protocol/case_update.dart' as _id85u6x2;
+import 'package:case_clarity_client/src/protocol/legal_case.dart' as _ikj33umw;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _iaic;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'case_clarity_user_profile.dart' as _ijms5s6d;
+import 'case_stage.dart' as _if5glxvh;
+import 'case_type.dart' as _igfaebu4;
+import 'case_update.dart' as _idl61rz9;
+import 'case_update_kind.dart' as _ibzvjs03;
 import 'greetings/greeting.dart' as _izw8z7ou;
+import 'legal_case.dart' as _ii7rdblg;
+import 'user_role.dart' as _ir0y0iu6;
+export 'case_clarity_user_profile.dart';
+export 'case_stage.dart';
+export 'case_type.dart';
+export 'case_update.dart';
+export 'case_update_kind.dart';
 export 'greetings/greeting.dart';
+export 'legal_case.dart';
+export 'user_role.dart';
 export 'client.dart';
 
 class Protocol extends _isc.SerializationManager
@@ -33,14 +49,39 @@ class Protocol extends _isc.SerializationManager
       _isc.ProtocolDeserialization.cached(
         this,
         types: const [
+          _isc.getType<_ijms5s6d.CaseClarityUserProfile>,
+          _isc.getType<_if5glxvh.CaseStage>,
+          _isc.getType<_igfaebu4.CaseType>,
+          _isc.getType<_idl61rz9.CaseUpdate>,
+          _isc.getType<_ibzvjs03.CaseUpdateKind>,
           _isc.getType<_izw8z7ou.Greeting>,
+          _isc.getType<_ii7rdblg.LegalCase>,
+          _isc.getType<_ir0y0iu6.UserRole>,
+          _isc.getType<_ijms5s6d.CaseClarityUserProfile?>,
+          _isc.getType<_if5glxvh.CaseStage?>,
+          _isc.getType<_igfaebu4.CaseType?>,
+          _isc.getType<_idl61rz9.CaseUpdate?>,
+          _isc.getType<_ibzvjs03.CaseUpdateKind?>,
           _isc.getType<_izw8z7ou.Greeting?>,
+          _isc.getType<_ii7rdblg.LegalCase?>,
+          _isc.getType<_ir0y0iu6.UserRole?>,
+          _isc.getType<List<_ikj33umw.LegalCase>>,
+          _isc.getType<List<_id85u6x2.CaseUpdate>>,
         ],
         modules: const [
           _iaic.Protocol.new,
           _iacc.Protocol.new,
         ],
-        classNames: const ['Greeting'],
+        classNames: const [
+          'CaseClarityUserProfile',
+          'CaseStage',
+          'CaseType',
+          'CaseUpdate',
+          'CaseUpdateKind',
+          'Greeting',
+          'LegalCase',
+          'UserRole',
+        ],
       );
 
   static String? getClassNameFromObjectJson(dynamic data) =>
@@ -67,11 +108,69 @@ class Protocol extends _isc.SerializationManager
       }
     }
 
+    if (t == _ijms5s6d.CaseClarityUserProfile) {
+      return _ijms5s6d.CaseClarityUserProfile.fromJson(data) as T;
+    }
+    if (t == _if5glxvh.CaseStage) {
+      return _if5glxvh.CaseStage.fromJson(data) as T;
+    }
+    if (t == _igfaebu4.CaseType) {
+      return _igfaebu4.CaseType.fromJson(data) as T;
+    }
+    if (t == _idl61rz9.CaseUpdate) {
+      return _idl61rz9.CaseUpdate.fromJson(data) as T;
+    }
+    if (t == _ibzvjs03.CaseUpdateKind) {
+      return _ibzvjs03.CaseUpdateKind.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
+    if (t == _ii7rdblg.LegalCase) {
+      return _ii7rdblg.LegalCase.fromJson(data) as T;
+    }
+    if (t == _ir0y0iu6.UserRole) {
+      return _ir0y0iu6.UserRole.fromJson(data) as T;
+    }
+    if (t == _isc.getType<_ijms5s6d.CaseClarityUserProfile?>()) {
+      return (data != null
+              ? _ijms5s6d.CaseClarityUserProfile.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _isc.getType<_if5glxvh.CaseStage?>()) {
+      return (data != null ? _if5glxvh.CaseStage.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_igfaebu4.CaseType?>()) {
+      return (data != null ? _igfaebu4.CaseType.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_idl61rz9.CaseUpdate?>()) {
+      return (data != null ? _idl61rz9.CaseUpdate.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ibzvjs03.CaseUpdateKind?>()) {
+      return (data != null ? _ibzvjs03.CaseUpdateKind.fromJson(data) : null)
+          as T;
+    }
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ii7rdblg.LegalCase?>()) {
+      return (data != null ? _ii7rdblg.LegalCase.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ir0y0iu6.UserRole?>()) {
+      return (data != null ? _ir0y0iu6.UserRole.fromJson(data) : null) as T;
+    }
+    if (t == List<_ikj33umw.LegalCase>) {
+      return (data as List)
+              .map((e) => deserialize<_ikj33umw.LegalCase>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_id85u6x2.CaseUpdate>) {
+      return (data as List)
+              .map((e) => deserialize<_id85u6x2.CaseUpdate>(e))
+              .toList()
+          as T;
     }
     final modules = deserializationMetadata.modulesForDeserialization(
       t,
@@ -88,7 +187,14 @@ class Protocol extends _isc.SerializationManager
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _ijms5s6d.CaseClarityUserProfile => 'CaseClarityUserProfile',
+      _if5glxvh.CaseStage => 'CaseStage',
+      _igfaebu4.CaseType => 'CaseType',
+      _idl61rz9.CaseUpdate => 'CaseUpdate',
+      _ibzvjs03.CaseUpdateKind => 'CaseUpdateKind',
       _izw8z7ou.Greeting => 'Greeting',
+      _ii7rdblg.LegalCase => 'LegalCase',
+      _ir0y0iu6.UserRole => 'UserRole',
       _ => null,
     };
   }
@@ -106,8 +212,22 @@ class Protocol extends _isc.SerializationManager
     }
 
     switch (data) {
+      case _ijms5s6d.CaseClarityUserProfile():
+        return 'CaseClarityUserProfile';
+      case _if5glxvh.CaseStage():
+        return 'CaseStage';
+      case _igfaebu4.CaseType():
+        return 'CaseType';
+      case _idl61rz9.CaseUpdate():
+        return 'CaseUpdate';
+      case _ibzvjs03.CaseUpdateKind():
+        return 'CaseUpdateKind';
       case _izw8z7ou.Greeting():
         return 'Greeting';
+      case _ii7rdblg.LegalCase():
+        return 'LegalCase';
+      case _ir0y0iu6.UserRole():
+        return 'UserRole';
     }
     className = _iaic.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -130,8 +250,29 @@ class Protocol extends _isc.SerializationManager
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
+    if (dataClassName == 'CaseClarityUserProfile') {
+      return deserialize<_ijms5s6d.CaseClarityUserProfile>(data['data']);
+    }
+    if (dataClassName == 'CaseStage') {
+      return deserialize<_if5glxvh.CaseStage>(data['data']);
+    }
+    if (dataClassName == 'CaseType') {
+      return deserialize<_igfaebu4.CaseType>(data['data']);
+    }
+    if (dataClassName == 'CaseUpdate') {
+      return deserialize<_idl61rz9.CaseUpdate>(data['data']);
+    }
+    if (dataClassName == 'CaseUpdateKind') {
+      return deserialize<_ibzvjs03.CaseUpdateKind>(data['data']);
+    }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
+    }
+    if (dataClassName == 'LegalCase') {
+      return deserialize<_ii7rdblg.LegalCase>(data['data']);
+    }
+    if (dataClassName == 'UserRole') {
+      return deserialize<_ir0y0iu6.UserRole>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       return _iaic.Protocol().deserializeByClassName({

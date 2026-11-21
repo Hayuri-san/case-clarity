@@ -10,6 +10,8 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:case_clarity_server/src/generated/case_stage.dart' as _i2ikh1jl;
+import 'package:case_clarity_server/src/generated/case_type.dart' as _inf7yx75;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -17,7 +19,10 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
 import '../auth/email_idp_endpoint.dart' as _iuc1hd5t;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
+import '../cases/case_endpoint.dart' as _iv5lencg;
+import '../cases/case_update_endpoint.dart' as _i4to6n7i;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
+import '../profile/profile_endpoint.dart' as _i6ky944g;
 
 class Endpoints extends _is.EndpointDispatch {
   @override
@@ -44,10 +49,28 @@ class Endpoints extends _is.EndpointDispatch {
           'jwtRefresh',
           null,
         ),
+      'cases': _iv5lencg.CasesEndpoint()
+        ..initialize(
+          server,
+          'cases',
+          null,
+        ),
+      'caseUpdate': _i4to6n7i.CaseUpdateEndpoint()
+        ..initialize(
+          server,
+          'caseUpdate',
+          null,
+        ),
       'greeting': _il624ik7.GreetingEndpoint()
         ..initialize(
           server,
           'greeting',
+          null,
+        ),
+      'profile': _i6ky944g.ProfileEndpoint()
+        ..initialize(
+          server,
+          'profile',
           null,
         ),
     };
@@ -345,6 +368,187 @@ class Endpoints extends _is.EndpointDispatch {
         ),
       },
     );
+    connectors['cases'] = _is.EndpointConnector(
+      name: 'cases',
+      endpoint: endpoints['cases']!,
+      methodConnectors: {
+        'createCase': _is.MethodConnector(
+          name: 'createCase',
+          params: {
+            'title': _is.ParameterDescription(
+              name: 'title',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'caseType': _is.ParameterDescription(
+              name: 'caseType',
+              type: _is.getType<_inf7yx75.CaseType>(),
+              nullable: false,
+            ),
+            'description': _is.ParameterDescription(
+              name: 'description',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['cases'] as _iv5lencg.CasesEndpoint).createCase(
+                    session,
+                    params['title'],
+                    params['caseType'],
+                    params['description'],
+                  ),
+        ),
+        'listMyCases': _is.MethodConnector(
+          name: 'listMyCases',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['cases'] as _iv5lencg.CasesEndpoint)
+                  .listMyCases(session),
+        ),
+        'getCase': _is.MethodConnector(
+          name: 'getCase',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['cases'] as _iv5lencg.CasesEndpoint).getCase(
+                    session,
+                    params['id'],
+                  ),
+        ),
+        'updateCaseInfo': _is.MethodConnector(
+          name: 'updateCaseInfo',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'title': _is.ParameterDescription(
+              name: 'title',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'description': _is.ParameterDescription(
+              name: 'description',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['cases'] as _iv5lencg.CasesEndpoint)
+                  .updateCaseInfo(
+                    session,
+                    params['id'],
+                    params['title'],
+                    params['description'],
+                  ),
+        ),
+      },
+    );
+    connectors['caseUpdate'] = _is.EndpointConnector(
+      name: 'caseUpdate',
+      endpoint: endpoints['caseUpdate']!,
+      methodConnectors: {
+        'addUpdate': _is.MethodConnector(
+          name: 'addUpdate',
+          params: {
+            'caseId': _is.ParameterDescription(
+              name: 'caseId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'title': _is.ParameterDescription(
+              name: 'title',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'description': _is.ParameterDescription(
+              name: 'description',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['caseUpdate'] as _i4to6n7i.CaseUpdateEndpoint)
+                      .addUpdate(
+                        session,
+                        params['caseId'],
+                        params['title'],
+                        params['description'],
+                      ),
+        ),
+        'changeStage': _is.MethodConnector(
+          name: 'changeStage',
+          params: {
+            'caseId': _is.ParameterDescription(
+              name: 'caseId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'stage': _is.ParameterDescription(
+              name: 'stage',
+              type: _is.getType<_i2ikh1jl.CaseStage>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['caseUpdate'] as _i4to6n7i.CaseUpdateEndpoint)
+                      .changeStage(
+                        session,
+                        params['caseId'],
+                        params['stage'],
+                      ),
+        ),
+        'listUpdates': _is.MethodConnector(
+          name: 'listUpdates',
+          params: {
+            'caseId': _is.ParameterDescription(
+              name: 'caseId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['caseUpdate'] as _i4to6n7i.CaseUpdateEndpoint)
+                      .listUpdates(
+                        session,
+                        params['caseId'],
+                      ),
+        ),
+      },
+    );
     connectors['greeting'] = _is.EndpointConnector(
       name: 'greeting',
       endpoint: endpoints['greeting']!,
@@ -366,6 +570,41 @@ class Endpoints extends _is.EndpointDispatch {
                   (endpoints['greeting'] as _il624ik7.GreetingEndpoint).hello(
                     session,
                     params['name'],
+                  ),
+        ),
+      },
+    );
+    connectors['profile'] = _is.EndpointConnector(
+      name: 'profile',
+      endpoint: endpoints['profile']!,
+      methodConnectors: {
+        'getMyProfile': _is.MethodConnector(
+          name: 'getMyProfile',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['profile'] as _i6ky944g.ProfileEndpoint)
+                  .getMyProfile(session),
+        ),
+        'createOrUpdateMyProfile': _is.MethodConnector(
+          name: 'createOrUpdateMyProfile',
+          params: {
+            'fullName': _is.ParameterDescription(
+              name: 'fullName',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['profile'] as _i6ky944g.ProfileEndpoint)
+                  .createOrUpdateMyProfile(
+                    session,
+                    params['fullName'],
                   ),
         ),
       },

@@ -1,0 +1,6 @@
+enum: CaseStage
+values:
+  - underReview
+  - inProgress
+  - awaitingDocuments
+  - resolved

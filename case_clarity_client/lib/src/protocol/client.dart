@@ -11,8 +11,14 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
+import 'package:case_clarity_client/src/protocol/case_clarity_user_profile.dart'
+    as _itm3avdn;
+import 'package:case_clarity_client/src/protocol/case_stage.dart' as _icw30b1m;
+import 'package:case_clarity_client/src/protocol/case_type.dart' as _iwmnh9om;
+import 'package:case_clarity_client/src/protocol/case_update.dart' as _id85u6x2;
 import 'package:case_clarity_client/src/protocol/greetings/greeting.dart'
     as _idcblnbt;
+import 'package:case_clarity_client/src/protocol/legal_case.dart' as _ikj33umw;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -347,6 +353,97 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
       );
 }
 
+/// {@category Endpoint}
+class EndpointCases extends _isc.EndpointRef {
+  EndpointCases(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'cases';
+
+  _ida.Future<_ikj33umw.LegalCase> createCase(
+    String title,
+    _iwmnh9om.CaseType caseType,
+    String description,
+  ) => caller.callServerEndpoint<_ikj33umw.LegalCase>(
+    'cases',
+    'createCase',
+    {
+      'title': title,
+      'caseType': caseType,
+      'description': description,
+    },
+  );
+
+  _ida.Future<List<_ikj33umw.LegalCase>> listMyCases() =>
+      caller.callServerEndpoint<List<_ikj33umw.LegalCase>>(
+        'cases',
+        'listMyCases',
+        {},
+      );
+
+  _ida.Future<_ikj33umw.LegalCase> getCase(int id) =>
+      caller.callServerEndpoint<_ikj33umw.LegalCase>(
+        'cases',
+        'getCase',
+        {'id': id},
+      );
+
+  _ida.Future<_ikj33umw.LegalCase> updateCaseInfo(
+    int id,
+    String title,
+    String description,
+  ) => caller.callServerEndpoint<_ikj33umw.LegalCase>(
+    'cases',
+    'updateCaseInfo',
+    {
+      'id': id,
+      'title': title,
+      'description': description,
+    },
+  );
+}
+
+/// {@category Endpoint}
+class EndpointCaseUpdate extends _isc.EndpointRef {
+  EndpointCaseUpdate(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'caseUpdate';
+
+  _ida.Future<_id85u6x2.CaseUpdate> addUpdate(
+    int caseId,
+    String title,
+    String description,
+  ) => caller.callServerEndpoint<_id85u6x2.CaseUpdate>(
+    'caseUpdate',
+    'addUpdate',
+    {
+      'caseId': caseId,
+      'title': title,
+      'description': description,
+    },
+  );
+
+  _ida.Future<_ikj33umw.LegalCase> changeStage(
+    int caseId,
+    _icw30b1m.CaseStage stage,
+  ) => caller.callServerEndpoint<_ikj33umw.LegalCase>(
+    'caseUpdate',
+    'changeStage',
+    {
+      'caseId': caseId,
+      'stage': stage,
+    },
+  );
+
+  _ida.Future<List<_id85u6x2.CaseUpdate>> listUpdates(int caseId) =>
+      caller.callServerEndpoint<List<_id85u6x2.CaseUpdate>>(
+        'caseUpdate',
+        'listUpdates',
+        {'caseId': caseId},
+      );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -363,6 +460,29 @@ class EndpointGreeting extends _isc.EndpointRef {
         'hello',
         {'name': name},
       );
+}
+
+/// {@category Endpoint}
+class EndpointProfile extends _isc.EndpointRef {
+  EndpointProfile(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'profile';
+
+  _ida.Future<_itm3avdn.CaseClarityUserProfile?> getMyProfile() =>
+      caller.callServerEndpoint<_itm3avdn.CaseClarityUserProfile?>(
+        'profile',
+        'getMyProfile',
+        {},
+      );
+
+  _ida.Future<_itm3avdn.CaseClarityUserProfile> createOrUpdateMyProfile(
+    String fullName,
+  ) => caller.callServerEndpoint<_itm3avdn.CaseClarityUserProfile>(
+    'profile',
+    'createOrUpdateMyProfile',
+    {'fullName': fullName},
+  );
 }
 
 class Modules {
@@ -405,7 +525,10 @@ class Client extends _isc.ServerpodClientShared {
        ) {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    cases = EndpointCases(this);
+    caseUpdate = EndpointCaseUpdate(this);
     greeting = EndpointGreeting(this);
+    profile = EndpointProfile(this);
     modules = Modules(this);
   }
 
@@ -413,7 +536,13 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointJwtRefresh jwtRefresh;
 
+  late final EndpointCases cases;
+
+  late final EndpointCaseUpdate caseUpdate;
+
   late final EndpointGreeting greeting;
+
+  late final EndpointProfile profile;
 
   late final Modules modules;
 
@@ -421,7 +550,10 @@ class Client extends _isc.ServerpodClientShared {
   Map<String, _isc.EndpointRef> get endpointRefLookup => {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
+    'cases': cases,
+    'caseUpdate': caseUpdate,
     'greeting': greeting,
+    'profile': profile,
   };
 
   @override

@@ -1,0 +1,12 @@
+class: CaseUpdate
+table: case_update
+fields:
+  caseId: int, relation(parent=legal_case)
+  authorId: UuidValue
+  kind: CaseUpdateKind
+  title: String
+  description: String
+  createdAt: DateTime, default=now
+indexes:
+  case_update_case_id_idx:
+    fields: caseId

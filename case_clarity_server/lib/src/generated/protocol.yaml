@@ -13,5 +13,17 @@ emailIdp:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
+cases:
+  - createCase:
+  - listMyCases:
+  - getCase:
+  - updateCaseInfo:
+caseUpdate:
+  - addUpdate:
+  - changeStage:
+  - listUpdates:
 greeting:
   - hello:
+profile:
+  - getMyProfile:
+  - createOrUpdateMyProfile:

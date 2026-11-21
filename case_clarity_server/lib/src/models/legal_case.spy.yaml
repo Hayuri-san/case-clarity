@@ -1,0 +1,16 @@
+class: LegalCase
+table: legal_case
+fields:
+  title: String
+  caseType: CaseType
+  description: String
+  stage: CaseStage, default=underReview
+  creatorId: UuidValue
+  assignedLawyerId: UuidValue?
+  createdAt: DateTime, default=now
+  updatedAt: DateTime, default=now
+indexes:
+  legal_case_creator_id_idx:
+    fields: creatorId
+  legal_case_assigned_lawyer_id_idx:
+    fields: assignedLawyerId

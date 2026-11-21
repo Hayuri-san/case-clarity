@@ -1,0 +1,11 @@
+class: CaseClarityUserProfile
+table: case_clarity_user_profile
+fields:
+  userId: UuidValue
+  fullName: String
+  role: UserRole
+  createdAt: DateTime, default=now
+indexes:
+  case_clarity_user_profile_user_id_idx:
+    fields: userId
+    unique: true
