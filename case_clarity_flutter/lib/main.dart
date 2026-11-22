@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'client.dart';
-import 'screens/greetings_screen.dart';
-import 'screens/sign_in_screen.dart';
+import 'features/authentication/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeClient();
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 /// Builds a theme for the given [brightness].
 ThemeData _buildTheme(Brightness brightness) {
   return ThemeData(
     colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.blue,
+      seedColor: const Color(0xFF176B62),
       brightness: brightness,
     ),
   );
@@ -27,31 +26,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Serverpod Demo',
+      title: 'Case Clarity',
       theme: _buildTheme(Brightness.light),
-      darkTheme: _buildTheme(Brightness.dark),
-      themeMode: ThemeMode.system,
-      home: const MyHomePage(title: 'Serverpod Example'),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: SignInScreen(
-        child: GreetingsScreen(
-          onSignOut: () async {
-            await client.auth.signOutDevice();
-          },
-        ),
-      ),
+      themeMode: ThemeMode.light,
+      home: const AuthGate(),
     );
   }
 }

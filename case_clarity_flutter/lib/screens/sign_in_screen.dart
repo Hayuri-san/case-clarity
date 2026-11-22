@@ -49,9 +49,9 @@ class _SignInScreenState extends State<SignInScreen> {
                   foregroundColor: colors.onPrimaryContainer,
                 );
               },
-              onError: (error) {
+              onError: (_) {
                 context.showSnackBar(
-                  message: 'Authentication failed: $error',
+                  message: 'We could not sign you in. Check your details and try again.',
                   backgroundColor: colors.errorContainer,
                   foregroundColor: colors.onErrorContainer,
                 );

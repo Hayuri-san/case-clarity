@@ -4,16 +4,13 @@ import 'package:case_clarity_client/case_clarity_client.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 
-// When you are running the app on a physical device, you need to set the
-// server URL to the IP address of your computer. You can find the IP
-// address by running `ipconfig` on Windows or `ifconfig` on Mac/Linux.
-//
-// You can set the variable when running or building your app like this:
-// E.g. `flutter run --dart-define=SERVER_URL=https://api.example.com/`.
-//
-// Otherwise, the server URL is fetched from the assets/config.json file or
-// defaults to http://$localhost:8080/ if not found.
-final serverUrl = getServerUrl();
+/// Change this one value for your target device. Chrome on this PC uses
+/// localhost; Android emulators use http://10.0.2.2:8080/; a real phone uses
+/// this PC's LAN IP, for example http://192.168.1.20:8080/.
+const serverUrl = String.fromEnvironment(
+  'SERVER_URL',
+  defaultValue: 'http://localhost:8080/',
+);
 
 /// Sets up a global client object that can be used to talk to the server from
 /// anywhere in our app. The client is generated from your server code
