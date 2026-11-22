@@ -6,12 +6,15 @@ import 'dart:typed_data';
 import 'package:serverpod/serverpod.dart';
 import 'package:case_clarity_server/src/generated/case_clarity_user_profile.dart';
 import 'package:case_clarity_server/src/generated/case_document.dart';
+import 'package:case_clarity_server/src/generated/case_stage.dart';
 import 'package:case_clarity_server/src/generated/case_type.dart';
+import 'package:case_clarity_server/src/generated/case_update_kind.dart';
 import 'package:case_clarity_server/src/generated/document_ocr_status.dart';
 import 'package:case_clarity_server/src/generated/legal_case.dart';
 import 'package:case_clarity_server/src/generated/user_role.dart';
 import 'package:case_clarity_server/src/documents/document_endpoint.dart';
 import 'package:case_clarity_server/src/services/ocr_service.dart';
+import 'package:case_clarity_server/src/services/legal_guide_seed.dart';
 import 'package:test/test.dart';
 
 import 'test_tools/serverpod_test_tools.dart';
@@ -135,6 +138,143 @@ void main() {
         expect(completed.ocrStatus, DocumentOcrStatus.completed);
         expect(completed.extractedText, isNotEmpty);
         expect(completed.candidateDates, isNotEmpty);
+      });
+
+      test('runs the cheque notice demo flow across citizen and lawyer access', () async {
+        final citizen = _asUser(
+          sessionBuilder,
+          '70000000-0000-4000-8000-000000000020',
+        );
+        final lawyer = _asUser(
+          sessionBuilder,
+          '70000000-0000-4000-8000-000000000021',
+        );
+        await _createProfile(endpoints, citizen, 'Demo Citizen');
+        final lawyerProfile = await endpoints.profile.createOrUpdateMyProfile(
+          lawyer,
+          'Demo Lawyer',
+        );
+        final setup = sessionBuilder.build();
+        await CaseClarityUserProfile.db.updateRow(
+          setup,
+          lawyerProfile.copyWith(role: UserRole.lawyer),
+        );
+        await seedLegalGuides(setup);
+
+        final guide = await endpoints.legalGuide.getGuide(
+          citizen,
+          'cheque-bounce',
+        );
+        expect(guide.title, isNotEmpty);
+        final createdCase = await endpoints.cases.createCase(
+          citizen,
+          'Cheque return notice',
+          CaseType.chequeBounce,
+          'The bank returned the cheque unpaid.',
+        );
+        await LegalCase.db.updateRow(
+          setup,
+          createdCase.copyWith(assignedLawyerId: lawyerProfile.userId),
+        );
+
+        final ticket = await endpoints.document.startUpload(
+          citizen,
+          createdCase.id!,
+          'cheque-return-notice.pdf',
+          'application/pdf',
+          _pdfBytes.length,
+        );
+        expect(await _uploadBinary(ticket.uploadDescription, _pdfBytes), anyOf(200, 204));
+        await endpoints.document.finishUpload(citizen, ticket.documentId);
+        final document = await _waitForOcr(
+          endpoints,
+          citizen,
+          ticket.documentId,
+        );
+        expect(document.ocrStatus, DocumentOcrStatus.completed);
+        expect(document.extractedText, isNotEmpty);
+        expect(document.candidateDates, hasLength(greaterThanOrEqualTo(4)));
+
+        DateTime confirmedDate(String value) {
+          final parts = value.split(RegExp(r'[/\-]'));
+          if (parts.length == 3) {
+            return DateTime.utc(
+              int.parse(parts[2]),
+              int.parse(parts[1]),
+              int.parse(parts[0]),
+            );
+          }
+
+          final namedDate = RegExp(
+            r'^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})$',
+          ).firstMatch(value.trim());
+          if (namedDate != null) {
+            const months = {
+              'january': 1,
+              'february': 2,
+              'march': 3,
+              'april': 4,
+              'may': 5,
+              'june': 6,
+              'july': 7,
+              'august': 8,
+              'september': 9,
+              'october': 10,
+              'november': 11,
+              'december': 12,
+            };
+            final month = months[namedDate.group(2)!.toLowerCase()];
+            if (month != null) {
+              return DateTime.utc(
+                int.parse(namedDate.group(3)!),
+                month,
+                int.parse(namedDate.group(1)!),
+              );
+            }
+          }
+          throw FormatException('Unsupported OCR date suggestion.', value);
+        }
+
+        final suggestions = document.candidateDates!;
+        final deadlines = await endpoints.deadline.calculateSection138(
+          citizen,
+          chequeDate: confirmedDate(suggestions[0]),
+          chequePresentedDate: confirmedDate(suggestions[1]),
+          dishonourIntimationDate: confirmedDate(suggestions[2]),
+          noticeSentDate: confirmedDate(suggestions[3]),
+          noticeReceivedDate: confirmedDate(suggestions[3]),
+        );
+        expect(deadlines.items, isNotEmpty);
+        expect(deadlines.disclaimer, contains('not legal advice'));
+
+        expect(
+          (await endpoints.cases.getCase(lawyer, createdCase.id!)).id,
+          createdCase.id,
+        );
+        final changedCase = await endpoints.caseUpdate.changeStage(
+          lawyer,
+          createdCase.id!,
+          CaseStage.inProgress,
+        );
+        expect(changedCase.stage, CaseStage.inProgress);
+        await endpoints.caseUpdate.addUpdate(
+          lawyer,
+          createdCase.id!,
+          'Notice reviewed',
+          'The confirmed notice dates were reviewed.',
+        );
+        final timeline = await endpoints.caseUpdate.listUpdates(
+          citizen,
+          createdCase.id!,
+        );
+        expect(timeline.map((update) => update.kind), contains(CaseUpdateKind.stageChange));
+        expect(timeline.last.title, 'Notice reviewed');
+        expect(
+          timeline.map((update) => update.createdAt),
+          orderedEquals(
+            timeline.map((update) => update.createdAt).toList()..sort(),
+          ),
+        );
       });
 
       test('rejects uploaded bytes whose signature differs from PDF metadata', () async {

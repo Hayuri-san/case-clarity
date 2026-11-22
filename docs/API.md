@@ -56,6 +56,29 @@ and returns while the document is `processing`. Clients can poll
 suggestions for the citizen to confirm. `storagePath` is server-only and
 document text is never logged.
 
+## Which call does each screen use
+
+| Screen | Calls |
+|---|---|
+| Sign-in | `EmailOtpSignInWidget(client: client)` for the email code flow; call `client.auth.initialize()` at app startup and observe `client.auth.authInfoListenable`. |
+| Profile | `profile.getMyProfile`; submit the name with `profile.createOrUpdateMyProfile(fullName)`. |
+| Home dashboard | `cases.listMyCases`; the returned cases are limited to cases created by the citizen or assigned to the lawyer. |
+| Guides | `legalGuide.listGuides`; open a guide with `legalGuide.getGuide(slug)`. |
+| Create case | `cases.createCase(title, caseType, description)`. |
+| My cases | `cases.listMyCases`. |
+| Case detail | `cases.getCase(id)`; citizen edits use `cases.updateCaseInfo(id, title, description)`. |
+| Timeline | `caseUpdate.listUpdates(caseId)`; the server returns oldest first. |
+| Upload document | `document.startUpload(caseId, fileName, mimeType, sizeBytes)`, then upload bytes using the returned Serverpod upload description, then `document.finishUpload(documentId)`. |
+| Poll document | Poll `document.getDocument(id)` until `ocrStatus` is `completed` or `failed`; `document.listDocuments(caseId)` lists case documents. |
+| Deadline calculator | `deadline.calculateSection138(...)` with citizen-confirmed dates; keep the returned assumptions and disclaimer visible. |
+| Lawyer dashboard | `cases.listMyCases`; open a case with `cases.getCase(id)` and its documents with `document.listDocuments(caseId)`. |
+| Change stage | `caseUpdate.changeStage(caseId, stage)`. |
+| Post update | `caseUpdate.addUpdate(caseId, title, description)`. |
+
+The auth module owns the sign-in request and response types; do not implement a
+separate email or token flow in the app. The widget is provided by
+`serverpod_auth_idp_flutter`.
+
 ## Local development only
 
 `dev.promoteToLawyer(email)` returns a `CaseClarityUserProfile`. It promotes the
