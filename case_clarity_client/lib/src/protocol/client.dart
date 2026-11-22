@@ -13,9 +13,13 @@
 import 'dart:async' as _ida;
 import 'package:case_clarity_client/src/protocol/case_clarity_user_profile.dart'
     as _itm3avdn;
+import 'package:case_clarity_client/src/protocol/case_document.dart'
+    as _ijnalc23;
 import 'package:case_clarity_client/src/protocol/case_stage.dart' as _icw30b1m;
 import 'package:case_clarity_client/src/protocol/case_type.dart' as _iwmnh9om;
 import 'package:case_clarity_client/src/protocol/case_update.dart' as _id85u6x2;
+import 'package:case_clarity_client/src/protocol/document_upload_ticket.dart'
+    as _io51ey2s;
 import 'package:case_clarity_client/src/protocol/greetings/greeting.dart'
     as _idcblnbt;
 import 'package:case_clarity_client/src/protocol/legal_case.dart' as _ikj33umw;
@@ -502,6 +506,51 @@ class EndpointDev extends _isc.EndpointRef {
   );
 }
 
+/// {@category Endpoint}
+class EndpointDocument extends _isc.EndpointRef {
+  EndpointDocument(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'document';
+
+  _ida.Future<_io51ey2s.DocumentUploadTicket> startUpload(
+    int caseId,
+    String fileName,
+    String mimeType,
+    int sizeBytes,
+  ) => caller.callServerEndpoint<_io51ey2s.DocumentUploadTicket>(
+    'document',
+    'startUpload',
+    {
+      'caseId': caseId,
+      'fileName': fileName,
+      'mimeType': mimeType,
+      'sizeBytes': sizeBytes,
+    },
+  );
+
+  _ida.Future<_ijnalc23.CaseDocument> finishUpload(int documentId) =>
+      caller.callServerEndpoint<_ijnalc23.CaseDocument>(
+        'document',
+        'finishUpload',
+        {'documentId': documentId},
+      );
+
+  _ida.Future<List<_ijnalc23.CaseDocument>> listDocuments(int caseId) =>
+      caller.callServerEndpoint<List<_ijnalc23.CaseDocument>>(
+        'document',
+        'listDocuments',
+        {'caseId': caseId},
+      );
+
+  _ida.Future<_ijnalc23.CaseDocument> getDocument(int id) =>
+      caller.callServerEndpoint<_ijnalc23.CaseDocument>(
+        'document',
+        'getDocument',
+        {'id': id},
+      );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -609,6 +658,7 @@ class Client extends _isc.ServerpodClientShared {
     caseUpdate = EndpointCaseUpdate(this);
     deadline = EndpointDeadline(this);
     dev = EndpointDev(this);
+    document = EndpointDocument(this);
     greeting = EndpointGreeting(this);
     legalGuide = EndpointLegalGuide(this);
     profile = EndpointProfile(this);
@@ -627,6 +677,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointDev dev;
 
+  late final EndpointDocument document;
+
   late final EndpointGreeting greeting;
 
   late final EndpointLegalGuide legalGuide;
@@ -643,6 +695,7 @@ class Client extends _isc.ServerpodClientShared {
     'caseUpdate': caseUpdate,
     'deadline': deadline,
     'dev': dev,
+    'document': document,
     'greeting': greeting,
     'legalGuide': legalGuide,
     'profile': profile,

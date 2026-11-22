@@ -1,0 +1,7 @@
+enum: DocumentOcrStatus
+serialized: byName
+values:
+  - pending
+  - processing
+  - completed
+  - failed

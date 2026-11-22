@@ -28,6 +28,9 @@ webServer:
   publicPort: 0
   publicScheme: http
 
+# Allow tests to exercise the configured 5 MiB document limit.
+maxRequestSize: 5242880
+
 # This is the database setup for your test server.
 database:
   host: localhost

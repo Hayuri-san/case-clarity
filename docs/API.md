@@ -24,6 +24,10 @@ that behavior.
 | `legalGuide.listGuides` | none | `List<LegalGuide>` sorted by `sortOrder` | Any signed-in user | Authentication required |
 | `legalGuide.getGuide` | `slug: String` | `LegalGuide` | Any signed-in user | Authentication required; `Guide not found.` |
 | `deadline.calculateSection138` | `chequeDate: DateTime`, `chequePresentedDate: DateTime`, `dishonourIntimationDate: DateTime`, optional `chequeValidityDate`, `noticeSentDate`, `noticeReceivedDate` | `Section138DeadlineResult` (`items`, `assumptions`, `disclaimer`) | Any signed-in user | Authentication required; dates must be UTC midnight and in event order |
+| `document.startUpload` | `caseId: int`, `fileName: String`, `mimeType: String`, `sizeBytes: int` | `DocumentUploadTicket` (`documentId`, `uploadDescription`) | Case's creating citizen | Authentication required; file must be PDF/JPG/PNG and no more than 5 MiB; case access uses `Case not found or access denied.` |
+| `document.finishUpload` | `documentId: int` | `CaseDocument` (initially `processing`) | Uploading citizen | Authentication required; verifies upload, size, and magic bytes; same generic case error for unavailable documents |
+| `document.listDocuments` | `caseId: int` | `List<CaseDocument>` (newest first) | Case's creating citizen or assigned lawyer | Authentication required; unavailable cases use `Case not found or access denied.` |
+| `document.getDocument` | `id: int` | `CaseDocument` (includes extracted text and suggested dates) | Case's creating citizen or assigned lawyer | Authentication required; `Case not found or access denied.` for missing or inaccessible documents |
 | `greeting.hello` | `name: String` | `Greeting` (`message`, `author`, `timestamp`) | Any caller | Standard Serverpod request errors may apply |
 
 `deadline.calculateSection138` returns date-only UTC deadlines for cheque
@@ -41,6 +45,16 @@ Legal guide content is informational. The cheque guide points readers to the
 Negotiable Instruments Act, 1881, Sections 138 and 142; statutory periods and
 court interpretations can depend on the facts, so users should confirm dates
 with a lawyer.
+
+Documents use Serverpod's private storage. Uploads are limited by
+`maxDocumentSizeBytes` (5 MiB) and `maxRequestSize` is set to the same size in
+each run-mode config so local database-backed uploads are accepted. The server
+checks the stored file size and PDF/JPG/PNG magic bytes before accepting it.
+OCR uses the offline `MockOcrProvider`; `finishUpload` queues background work
+and returns while the document is `processing`. Clients can poll
+`document.getDocument` for `completed` or `failed`. Candidate dates are
+suggestions for the citizen to confirm. `storagePath` is server-only and
+document text is never logged.
 
 ## Local development only
 

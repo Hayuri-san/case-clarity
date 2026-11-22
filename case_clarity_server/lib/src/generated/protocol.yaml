@@ -27,6 +27,11 @@ deadline:
 dev:
   - promoteToLawyer:
   - seedDemoData:
+document:
+  - startUpload:
+  - finishUpload:
+  - listDocuments:
+  - getDocument:
 greeting:
   - hello:
 legalGuide:

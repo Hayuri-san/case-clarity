@@ -15,10 +15,14 @@ import 'dart:async' as _ida;
 import 'dart:io' as _idi;
 import 'package:case_clarity_server/src/generated/case_clarity_user_profile.dart'
     as _ic74p3j2;
+import 'package:case_clarity_server/src/generated/case_document.dart'
+    as _iq5uaraq;
 import 'package:case_clarity_server/src/generated/case_stage.dart' as _i2ikh1jl;
 import 'package:case_clarity_server/src/generated/case_type.dart' as _inf7yx75;
 import 'package:case_clarity_server/src/generated/case_update.dart'
     as _i6d219a5;
+import 'package:case_clarity_server/src/generated/document_upload_ticket.dart'
+    as _ipbc30pd;
 import 'package:case_clarity_server/src/generated/greetings/greeting.dart'
     as _igbupn3s;
 import 'package:case_clarity_server/src/generated/legal_case.dart' as _ih17r1z6;
@@ -177,6 +181,8 @@ class TestEndpoints {
 
   late final _DevEndpoint dev;
 
+  late final _DocumentEndpoint document;
+
   late final _GreetingEndpoint greeting;
 
   late final _LegalGuideEndpoint legalGuide;
@@ -212,6 +218,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     dev = _DevEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    document = _DocumentEndpoint(
       endpoints,
       serializationManager,
     );
@@ -1063,6 +1073,149 @@ class _DevEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<_ih17r1z6.LegalCase>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _DocumentEndpoint {
+  _DocumentEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_ipbc30pd.DocumentUploadTicket> startUpload(
+    _ist.TestSessionBuilder sessionBuilder,
+    int caseId,
+    String fileName,
+    String mimeType,
+    int sizeBytes,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'document',
+            method: 'startUpload',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'document',
+          methodName: 'startUpload',
+          parameters: _ist.testObjectToJson({
+            'caseId': caseId,
+            'fileName': fileName,
+            'mimeType': mimeType,
+            'sizeBytes': sizeBytes,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ipbc30pd.DocumentUploadTicket>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iq5uaraq.CaseDocument> finishUpload(
+    _ist.TestSessionBuilder sessionBuilder,
+    int documentId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'document',
+            method: 'finishUpload',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'document',
+          methodName: 'finishUpload',
+          parameters: _ist.testObjectToJson({'documentId': documentId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iq5uaraq.CaseDocument>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_iq5uaraq.CaseDocument>> listDocuments(
+    _ist.TestSessionBuilder sessionBuilder,
+    int caseId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'document',
+            method: 'listDocuments',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'document',
+          methodName: 'listDocuments',
+          parameters: _ist.testObjectToJson({'caseId': caseId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_iq5uaraq.CaseDocument>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iq5uaraq.CaseDocument> getDocument(
+    _ist.TestSessionBuilder sessionBuilder,
+    int id,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'document',
+            method: 'getDocument',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'document',
+          methodName: 'getDocument',
+          parameters: _ist.testObjectToJson({'id': id}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iq5uaraq.CaseDocument>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

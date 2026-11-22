@@ -1,0 +1,4 @@
+class: DocumentUploadTicket
+fields:
+  documentId: int
+  uploadDescription: String

@@ -1,6 +1,5 @@
 import 'package:case_clarity_server/src/generated/legal_guide.dart';
 import 'package:case_clarity_server/src/services/legal_guide_seed.dart';
-import 'package:serverpod/serverpod.dart';
 import 'package:test/test.dart';
 
 import 'test_tools/serverpod_test_tools.dart';

@@ -1,0 +1,19 @@
+class: CaseDocument
+table: case_document
+fields:
+  caseId: int, relation(parent=legal_case)
+  uploaderId: UuidValue
+  fileName: String
+  mimeType: String
+  sizeBytes: int
+  storagePath: String?, scope=serverOnly
+  ocrStatus: DocumentOcrStatus, default=pending
+  extractedText: String?
+  candidateDates: List<String>?
+  errorMessage: String?
+  createdAt: DateTime, default=now
+indexes:
+  case_document_case_id_idx:
+    fields: caseId
+  case_document_uploader_id_idx:
+    fields: uploaderId

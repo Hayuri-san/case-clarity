@@ -11,6 +11,8 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:case_clarity_server/src/generated/case_document.dart'
+    as _iq5uaraq;
 import 'package:case_clarity_server/src/generated/case_update.dart'
     as _i6d219a5;
 import 'package:case_clarity_server/src/generated/legal_case.dart' as _ih17r1z6;
@@ -23,24 +25,30 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
 import 'case_clarity_user_profile.dart' as _ijms5s6d;
+import 'case_document.dart' as _isk23zr1;
 import 'case_stage.dart' as _if5glxvh;
 import 'case_type.dart' as _igfaebu4;
 import 'case_update.dart' as _idl61rz9;
 import 'case_update_kind.dart' as _ibzvjs03;
 import 'deadline_item.dart' as _ith1d9x5;
 import 'deadline_status.dart' as _i9rknlqw;
+import 'document_ocr_status.dart' as _igofstph;
+import 'document_upload_ticket.dart' as _i8migf7f;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'legal_case.dart' as _ii7rdblg;
 import 'legal_guide.dart' as _iqo2rnry;
 import 'section138_deadline_result.dart' as _iho072sf;
 import 'user_role.dart' as _ir0y0iu6;
 export 'case_clarity_user_profile.dart';
+export 'case_document.dart';
 export 'case_stage.dart';
 export 'case_type.dart';
 export 'case_update.dart';
 export 'case_update_kind.dart';
 export 'deadline_item.dart';
 export 'deadline_status.dart';
+export 'document_ocr_status.dart';
+export 'document_upload_ticket.dart';
 export 'greetings/greeting.dart';
 export 'legal_case.dart';
 export 'legal_guide.dart';
@@ -61,33 +69,41 @@ class Protocol extends _is.DatabaseSerializationManager
         this,
         types: const [
           _is.getType<_ijms5s6d.CaseClarityUserProfile>,
+          _is.getType<_isk23zr1.CaseDocument>,
           _is.getType<_if5glxvh.CaseStage>,
           _is.getType<_igfaebu4.CaseType>,
           _is.getType<_idl61rz9.CaseUpdate>,
           _is.getType<_ibzvjs03.CaseUpdateKind>,
           _is.getType<_ith1d9x5.DeadlineItem>,
           _is.getType<_i9rknlqw.DeadlineStatus>,
+          _is.getType<_igofstph.DocumentOcrStatus>,
+          _is.getType<_i8migf7f.DocumentUploadTicket>,
           _is.getType<_izw8z7ou.Greeting>,
           _is.getType<_ii7rdblg.LegalCase>,
           _is.getType<_iqo2rnry.LegalGuide>,
           _is.getType<_iho072sf.Section138DeadlineResult>,
           _is.getType<_ir0y0iu6.UserRole>,
           _is.getType<_ijms5s6d.CaseClarityUserProfile?>,
+          _is.getType<_isk23zr1.CaseDocument?>,
           _is.getType<_if5glxvh.CaseStage?>,
           _is.getType<_igfaebu4.CaseType?>,
           _is.getType<_idl61rz9.CaseUpdate?>,
           _is.getType<_ibzvjs03.CaseUpdateKind?>,
           _is.getType<_ith1d9x5.DeadlineItem?>,
           _is.getType<_i9rknlqw.DeadlineStatus?>,
+          _is.getType<_igofstph.DocumentOcrStatus?>,
+          _is.getType<_i8migf7f.DocumentUploadTicket?>,
           _is.getType<_izw8z7ou.Greeting?>,
           _is.getType<_ii7rdblg.LegalCase?>,
           _is.getType<_iqo2rnry.LegalGuide?>,
           _is.getType<_iho072sf.Section138DeadlineResult?>,
           _is.getType<_ir0y0iu6.UserRole?>,
           _is.getType<List<String>>,
+          _is.getType<List<String>?>,
           _is.getType<List<_ith1d9x5.DeadlineItem>>,
           _is.getType<List<_ih17r1z6.LegalCase>>,
           _is.getType<List<_i6d219a5.CaseUpdate>>,
+          _is.getType<List<_iq5uaraq.CaseDocument>>,
           _is.getType<List<_ir6mm7hc.LegalGuide>>,
         ],
         modules: const [
@@ -97,12 +113,15 @@ class Protocol extends _is.DatabaseSerializationManager
         ],
         classNames: const [
           'CaseClarityUserProfile',
+          'CaseDocument',
           'CaseStage',
           'CaseType',
           'CaseUpdate',
           'CaseUpdateKind',
           'DeadlineItem',
           'DeadlineStatus',
+          'DocumentOcrStatus',
+          'DocumentUploadTicket',
           'Greeting',
           'LegalCase',
           'LegalGuide',
@@ -171,6 +190,130 @@ class Protocol extends _is.DatabaseSerializationManager
           ],
           type: 'btree',
           isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'case_document',
+      dartName: 'CaseDocument',
+      schema: 'public',
+      module: 'case_clarity',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'caseId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'uploaderId',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'fileName',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'mimeType',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'sizeBytes',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'storagePath',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'ocrStatus',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:DocumentOcrStatus',
+          columnDefault: '\'pending\'',
+        ),
+        _isp.ColumnDefinition(
+          name: 'extractedText',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'candidateDates',
+          columnType: _isp.ColumnType.json,
+          isNullable: true,
+          dartType: 'List<String>?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'errorMessage',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'now',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'case_document_fk_0',
+          columns: ['caseId'],
+          referenceTable: 'legal_case',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'case_document_case_id_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'caseId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'case_document_uploader_id_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'uploaderId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
           isPrimary: false,
         ),
       ],
@@ -474,6 +617,9 @@ class Protocol extends _is.DatabaseSerializationManager
     if (t == _ijms5s6d.CaseClarityUserProfile) {
       return _ijms5s6d.CaseClarityUserProfile.fromJson(data) as T;
     }
+    if (t == _isk23zr1.CaseDocument) {
+      return _isk23zr1.CaseDocument.fromJson(data) as T;
+    }
     if (t == _if5glxvh.CaseStage) {
       return _if5glxvh.CaseStage.fromJson(data) as T;
     }
@@ -491,6 +637,12 @@ class Protocol extends _is.DatabaseSerializationManager
     }
     if (t == _i9rknlqw.DeadlineStatus) {
       return _i9rknlqw.DeadlineStatus.fromJson(data) as T;
+    }
+    if (t == _igofstph.DocumentOcrStatus) {
+      return _igofstph.DocumentOcrStatus.fromJson(data) as T;
+    }
+    if (t == _i8migf7f.DocumentUploadTicket) {
+      return _i8migf7f.DocumentUploadTicket.fromJson(data) as T;
     }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
@@ -513,6 +665,9 @@ class Protocol extends _is.DatabaseSerializationManager
               : null)
           as T;
     }
+    if (t == _is.getType<_isk23zr1.CaseDocument?>()) {
+      return (data != null ? _isk23zr1.CaseDocument.fromJson(data) : null) as T;
+    }
     if (t == _is.getType<_if5glxvh.CaseStage?>()) {
       return (data != null ? _if5glxvh.CaseStage.fromJson(data) : null) as T;
     }
@@ -531,6 +686,16 @@ class Protocol extends _is.DatabaseSerializationManager
     }
     if (t == _is.getType<_i9rknlqw.DeadlineStatus?>()) {
       return (data != null ? _i9rknlqw.DeadlineStatus.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_igofstph.DocumentOcrStatus?>()) {
+      return (data != null ? _igofstph.DocumentOcrStatus.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i8migf7f.DocumentUploadTicket?>()) {
+      return (data != null
+              ? _i8migf7f.DocumentUploadTicket.fromJson(data)
+              : null)
           as T;
     }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
@@ -554,6 +719,12 @@ class Protocol extends _is.DatabaseSerializationManager
     if (t == List<String>) {
       return (data as List).map((e) => deserialize<String>(e)).toList() as T;
     }
+    if (t == _is.getType<List<String>?>()) {
+      return (data != null
+              ? (data as List).map((e) => deserialize<String>(e)).toList()
+              : null)
+          as T;
+    }
     if (t == List<_ith1d9x5.DeadlineItem>) {
       return (data as List)
               .map((e) => deserialize<_ith1d9x5.DeadlineItem>(e))
@@ -569,6 +740,12 @@ class Protocol extends _is.DatabaseSerializationManager
     if (t == List<_i6d219a5.CaseUpdate>) {
       return (data as List)
               .map((e) => deserialize<_i6d219a5.CaseUpdate>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_iq5uaraq.CaseDocument>) {
+      return (data as List)
+              .map((e) => deserialize<_iq5uaraq.CaseDocument>(e))
               .toList()
           as T;
     }
@@ -594,12 +771,15 @@ class Protocol extends _is.DatabaseSerializationManager
   static String? getClassNameForType(Type type) {
     return switch (type) {
       _ijms5s6d.CaseClarityUserProfile => 'CaseClarityUserProfile',
+      _isk23zr1.CaseDocument => 'CaseDocument',
       _if5glxvh.CaseStage => 'CaseStage',
       _igfaebu4.CaseType => 'CaseType',
       _idl61rz9.CaseUpdate => 'CaseUpdate',
       _ibzvjs03.CaseUpdateKind => 'CaseUpdateKind',
       _ith1d9x5.DeadlineItem => 'DeadlineItem',
       _i9rknlqw.DeadlineStatus => 'DeadlineStatus',
+      _igofstph.DocumentOcrStatus => 'DocumentOcrStatus',
+      _i8migf7f.DocumentUploadTicket => 'DocumentUploadTicket',
       _izw8z7ou.Greeting => 'Greeting',
       _ii7rdblg.LegalCase => 'LegalCase',
       _iqo2rnry.LegalGuide => 'LegalGuide',
@@ -624,6 +804,8 @@ class Protocol extends _is.DatabaseSerializationManager
     switch (data) {
       case _ijms5s6d.CaseClarityUserProfile():
         return 'CaseClarityUserProfile';
+      case _isk23zr1.CaseDocument():
+        return 'CaseDocument';
       case _if5glxvh.CaseStage():
         return 'CaseStage';
       case _igfaebu4.CaseType():
@@ -636,6 +818,10 @@ class Protocol extends _is.DatabaseSerializationManager
         return 'DeadlineItem';
       case _i9rknlqw.DeadlineStatus():
         return 'DeadlineStatus';
+      case _igofstph.DocumentOcrStatus():
+        return 'DocumentOcrStatus';
+      case _i8migf7f.DocumentUploadTicket():
+        return 'DocumentUploadTicket';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _ii7rdblg.LegalCase():
@@ -675,6 +861,9 @@ class Protocol extends _is.DatabaseSerializationManager
     if (dataClassName == 'CaseClarityUserProfile') {
       return deserialize<_ijms5s6d.CaseClarityUserProfile>(data['data']);
     }
+    if (dataClassName == 'CaseDocument') {
+      return deserialize<_isk23zr1.CaseDocument>(data['data']);
+    }
     if (dataClassName == 'CaseStage') {
       return deserialize<_if5glxvh.CaseStage>(data['data']);
     }
@@ -692,6 +881,12 @@ class Protocol extends _is.DatabaseSerializationManager
     }
     if (dataClassName == 'DeadlineStatus') {
       return deserialize<_i9rknlqw.DeadlineStatus>(data['data']);
+    }
+    if (dataClassName == 'DocumentOcrStatus') {
+      return deserialize<_igofstph.DocumentOcrStatus>(data['data']);
+    }
+    if (dataClassName == 'DocumentUploadTicket') {
+      return deserialize<_i8migf7f.DocumentUploadTicket>(data['data']);
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
@@ -757,6 +952,8 @@ class Protocol extends _is.DatabaseSerializationManager
     switch (t) {
       case _ijms5s6d.CaseClarityUserProfile:
         return _ijms5s6d.CaseClarityUserProfile.t;
+      case _isk23zr1.CaseDocument:
+        return _isk23zr1.CaseDocument.t;
       case _idl61rz9.CaseUpdate:
         return _idl61rz9.CaseUpdate.t;
       case _ii7rdblg.LegalCase:

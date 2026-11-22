@@ -23,6 +23,7 @@ import '../cases/case_endpoint.dart' as _iv5lencg;
 import '../cases/case_update_endpoint.dart' as _i4to6n7i;
 import '../deadlines/deadline_endpoint.dart' as _i8oq584x;
 import '../dev/dev_endpoint.dart' as _ifx9z153;
+import '../documents/document_endpoint.dart' as _i6slyhtr;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
 import '../guides/legal_guide_endpoint.dart' as _ici4s7b9;
 import '../profile/profile_endpoint.dart' as _i6ky944g;
@@ -74,6 +75,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'dev',
+          null,
+        ),
+      'document': _i6slyhtr.DocumentEndpoint()
+        ..initialize(
+          server,
+          'document',
           null,
         ),
       'greeting': _il624ik7.GreetingEndpoint()
@@ -671,6 +678,106 @@ class Endpoints extends _is.EndpointDispatch {
                     session,
                     params['citizenEmail'],
                     params['lawyerEmail'],
+                  ),
+        ),
+      },
+    );
+    connectors['document'] = _is.EndpointConnector(
+      name: 'document',
+      endpoint: endpoints['document']!,
+      methodConnectors: {
+        'startUpload': _is.MethodConnector(
+          name: 'startUpload',
+          params: {
+            'caseId': _is.ParameterDescription(
+              name: 'caseId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'fileName': _is.ParameterDescription(
+              name: 'fileName',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'mimeType': _is.ParameterDescription(
+              name: 'mimeType',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'sizeBytes': _is.ParameterDescription(
+              name: 'sizeBytes',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['document'] as _i6slyhtr.DocumentEndpoint)
+                  .startUpload(
+                    session,
+                    params['caseId'],
+                    params['fileName'],
+                    params['mimeType'],
+                    params['sizeBytes'],
+                  ),
+        ),
+        'finishUpload': _is.MethodConnector(
+          name: 'finishUpload',
+          params: {
+            'documentId': _is.ParameterDescription(
+              name: 'documentId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['document'] as _i6slyhtr.DocumentEndpoint)
+                  .finishUpload(
+                    session,
+                    params['documentId'],
+                  ),
+        ),
+        'listDocuments': _is.MethodConnector(
+          name: 'listDocuments',
+          params: {
+            'caseId': _is.ParameterDescription(
+              name: 'caseId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['document'] as _i6slyhtr.DocumentEndpoint)
+                  .listDocuments(
+                    session,
+                    params['caseId'],
+                  ),
+        ),
+        'getDocument': _is.MethodConnector(
+          name: 'getDocument',
+          params: {
+            'id': _is.ParameterDescription(
+              name: 'id',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['document'] as _i6slyhtr.DocumentEndpoint)
+                  .getDocument(
+                    session,
+                    params['id'],
                   ),
         ),
       },
