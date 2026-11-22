@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/app_providers.dart';
+import 'app_components.dart';
 
 class AsyncContent<T> extends StatelessWidget {
   const AsyncContent({
@@ -18,17 +19,23 @@ class AsyncContent<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (value.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const SkeletonLoader();
     }
     if (value.hasError) {
-      return ErrorPanel(message: friendlyError(value.error!), onRetry: onRetry);
+      return ErrorState(message: friendlyError(value.error!), onRetry: onRetry);
     }
     if (!value.hasValue) {
-      return ErrorPanel(message: 'No information was returned.', onRetry: onRetry);
+      return const EmptyState(
+        icon: Icons.inbox_outlined,
+        message: 'No information was returned.',
+      );
     }
     final result = value.value;
     if (result == null) {
-      return ErrorPanel(message: 'No information was returned.', onRetry: onRetry);
+      return const EmptyState(
+        icon: Icons.inbox_outlined,
+        message: 'No information was returned.',
+      );
     }
     return data(result);
   }
@@ -45,26 +52,8 @@ class ErrorPanel extends StatelessWidget {
   final VoidCallback? onRetry;
 
   @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.info_outline, color: colors.error, size: 36),
-            const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center),
-            if (onRetry != null) ...[
-              const SizedBox(height: 12),
-              OutlinedButton(onPressed: onRetry, child: const Text('Try again')),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      ErrorState(message: message, onRetry: onRetry);
 }
 
 class EmptyPanel extends StatelessWidget {
@@ -73,11 +62,9 @@ class EmptyPanel extends StatelessWidget {
   final String message;
 
   @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Text(message, textAlign: TextAlign.center),
-    ),
+  Widget build(BuildContext context) => EmptyState(
+    icon: Icons.folder_open_outlined,
+    message: message,
   );
 }
 

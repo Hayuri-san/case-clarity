@@ -125,7 +125,25 @@ class _MainShellState extends ConsumerState<MainShell> {
         actions: [
           TextButton.icon(
             onPressed: () async {
-              await ref.read(clientProvider).auth.signOutDevice();
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (dialogContext) => AlertDialog(
+                  title: const Text('Sign out?'),
+                  content: const Text('You can sign back in at any time.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext, false),
+                      child: const Text('Cancel'),
+                    ),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(dialogContext, true),
+                      child: const Text('Sign out'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirmed == true)
+                await ref.read(clientProvider).auth.signOutDevice();
             },
             icon: const Icon(Icons.logout),
             label: const Text('Sign out'),
@@ -135,12 +153,58 @@ class _MainShellState extends ConsumerState<MainShell> {
         ],
       ),
       body: SafeArea(
-        child: IndexedStack(index: _selectedIndex, children: _pages),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final wide = constraints.maxWidth >= 840;
+            final page = AnimatedSwitcher(
+              duration: const Duration(milliseconds: 220),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1100),
+                  child: IndexedStack(
+                    key: ValueKey(_selectedIndex),
+                    index: _selectedIndex,
+                    children: _pages,
+                  ),
+                ),
+              ),
+            );
+            if (!wide) return page;
+            return Row(
+              children: [
+                NavigationRail(
+                  selectedIndex: _selectedIndex,
+                  labelType: NavigationRailLabelType.all,
+                  destinations: _destinations
+                      .map(
+                        (destination) => NavigationRailDestination(
+                          icon: destination.icon,
+                          selectedIcon:
+                              destination.selectedIcon ?? destination.icon,
+                          label: Text(destination.label),
+                        ),
+                      )
+                      .toList(),
+                  onDestinationSelected: (index) =>
+                      setState(() => _selectedIndex = index),
+                ),
+                const VerticalDivider(width: 1),
+                Expanded(child: page),
+              ],
+            );
+          },
+        ),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        destinations: _destinations,
-        onDestinationSelected: (index) => setState(() => _selectedIndex = index),
+      bottomNavigationBar: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth >= 840) return const SizedBox.shrink();
+          return NavigationBar(
+            selectedIndex: _selectedIndex,
+            destinations: _destinations,
+            onDestinationSelected: (index) =>
+                setState(() => _selectedIndex = index),
+          );
+        },
       ),
     );
   }

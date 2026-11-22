@@ -8,8 +8,9 @@ import '../screens/sign_in_screen.dart';
 
 final clientProvider = Provider<Client>((ref) => app_client.client);
 
-final signedInProvider =
-    NotifierProvider<SignedInController, bool>(SignedInController.new);
+final signedInProvider = NotifierProvider<SignedInController, bool>(
+  SignedInController.new,
+);
 
 class SignedInController extends Notifier<bool> {
   @override
@@ -46,8 +47,8 @@ final legalGuidesProvider = FutureProvider.autoDispose<List<LegalGuide>>(
   (ref) => ref.watch(clientProvider).legalGuide.listGuides(),
 );
 
-final legalGuideProvider =
-    FutureProvider.autoDispose.family<LegalGuide, String>(
+final legalGuideProvider = FutureProvider.autoDispose
+    .family<LegalGuide, String>(
       (ref, slug) => ref.watch(clientProvider).legalGuide.getGuide(slug),
     );
 
@@ -55,12 +56,13 @@ final legalCaseProvider = FutureProvider.autoDispose.family<LegalCase, int>(
   (ref, id) => ref.watch(clientProvider).cases.getCase(id),
 );
 
-final caseUpdatesProvider = FutureProvider.autoDispose.family<List<CaseUpdate>, int>(
-  (ref, caseId) => ref.watch(clientProvider).caseUpdate.listUpdates(caseId),
-);
+final caseUpdatesProvider = FutureProvider.autoDispose
+    .family<List<CaseUpdate>, int>(
+      (ref, caseId) => ref.watch(clientProvider).caseUpdate.listUpdates(caseId),
+    );
 
-final caseDocumentsProvider =
-    FutureProvider.autoDispose.family<List<CaseDocument>, int>(
+final caseDocumentsProvider = FutureProvider.autoDispose
+    .family<List<CaseDocument>, int>(
       (ref, caseId) => ref.watch(clientProvider).document.listDocuments(caseId),
     );
 

@@ -5,12 +5,17 @@ class DateSuggestion {
   final DateTime? date;
 }
 
-List<DateSuggestion> parseDateSuggestions(Iterable<String> values) =>
-    values.map((value) => DateSuggestion(text: value, date: parseDateSuggestion(value))).toList();
+List<DateSuggestion> parseDateSuggestions(Iterable<String> values) => values
+    .map(
+      (value) => DateSuggestion(text: value, date: parseDateSuggestion(value)),
+    )
+    .toList();
 
 DateTime? parseDateSuggestion(String value) {
   final text = value.trim();
-  final numeric = RegExp(r'^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$').firstMatch(text);
+  final numeric = RegExp(
+    r'^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$',
+  ).firstMatch(text);
   if (numeric != null) {
     return _validDate(
       int.parse(numeric.group(3)!),

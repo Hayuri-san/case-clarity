@@ -4,22 +4,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/date_format.dart';
 import '../../providers/app_providers.dart';
+import '../../widgets/app_components.dart';
 import '../../widgets/async_content.dart';
 import '../cases/case_screens.dart';
 
-final lawyerRecentActivityProvider = FutureProvider.autoDispose<List<({LegalCase legalCase, CaseUpdate update})>>((ref) async {
-  final client = ref.watch(clientProvider);
-  final cases = await client.cases.listMyCases();
-  final entries = <({LegalCase legalCase, CaseUpdate update})>[];
-  for (final legalCase in cases.take(12)) {
-    final updates = await client.caseUpdate.listUpdates(legalCase.id!);
-    for (final update in updates) {
-      entries.add((legalCase: legalCase, update: update));
-    }
-  }
-  entries.sort((a, b) => b.update.createdAt.compareTo(a.update.createdAt));
-  return entries.take(5).toList();
-});
+final lawyerRecentActivityProvider =
+    FutureProvider.autoDispose<
+      List<({LegalCase legalCase, CaseUpdate update})>
+    >((ref) async {
+      final client = ref.watch(clientProvider);
+      final cases = await client.cases.listMyCases();
+      final entries = <({LegalCase legalCase, CaseUpdate update})>[];
+      for (final legalCase in cases.take(12)) {
+        final updates = await client.caseUpdate.listUpdates(legalCase.id!);
+        for (final update in updates) {
+          entries.add((legalCase: legalCase, update: update));
+        }
+      }
+      entries.sort((a, b) => b.update.createdAt.compareTo(a.update.createdAt));
+      return entries.take(5).toList();
+    });
 
 class LawyerDashboardScreen extends ConsumerWidget {
   const LawyerDashboardScreen({super.key});
@@ -31,28 +35,36 @@ class LawyerDashboardScreen extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text('Your practice', style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: 6),
-        const Text('A quick view of your assigned cases.'),
+        const SectionHeader(
+          title: 'Your practice',
+          subtitle: 'A quick view of your assigned cases.',
+        ),
         const SizedBox(height: 18),
         cases.when(
-          loading: () => const LinearProgressIndicator(),
-          error: (error, stack) => ErrorPanel(message: friendlyError(error), onRetry: () => ref.invalidate(myCasesProvider)),
+          loading: () => const SkeletonLoader(rows: 2),
+          error: (error, stack) => ErrorPanel(
+            message: friendlyError(error),
+            onRetry: () => ref.invalidate(myCasesProvider),
+          ),
           data: (items) => Wrap(
             spacing: 8,
             runSpacing: 8,
             children: CaseStage.values.map((stage) {
               final count = items.where((item) => item.stage == stage).length;
               return SizedBox(
-                width: 150,
-                child: Card(
+                width: 170,
+                child: AppCard(
                   color: Theme.of(context).colorScheme.secondaryContainer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('$count', style: Theme.of(context).textTheme.headlineMedium),
-                      Text(stageLabel(stage.name)),
-                    ]),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$count',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      StatusChip.forStage(stage),
+                    ],
                   ),
                 ),
               );
@@ -60,15 +72,25 @@ class LawyerDashboardScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 22),
-        Row(children: [
-          Expanded(child: Text('Recent activity', style: Theme.of(context).textTheme.titleLarge)),
-          TextButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
-            builder: (_) => const Scaffold(appBar: _CasesAppBar(), body: CaseListScreen()),
-          )), child: const Text('All cases')),
-        ]),
+        Row(
+          children: [
+            const Expanded(child: SectionHeader(title: 'Recent activity')),
+            TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const Scaffold(
+                    appBar: _CasesAppBar(),
+                    body: CaseListScreen(),
+                  ),
+                ),
+              ),
+              child: const Text('All cases'),
+            ),
+          ],
+        ),
         const SizedBox(height: 8),
         activity.when(
-          loading: () => const LinearProgressIndicator(),
+          loading: () => const SkeletonLoader(rows: 2),
           error: (error, stack) => Text(friendlyError(error)),
           data: (items) {
             if (items.isEmpty) {
@@ -113,5 +135,6 @@ class _CasesAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
   @override
-  Widget build(BuildContext context) => AppBar(title: const Text('Assigned cases'));
+  Widget build(BuildContext context) =>
+      AppBar(title: const Text('Assigned cases'));
 }

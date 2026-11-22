@@ -1,11 +1,11 @@
 {
-    "name": "case_clarity",
-    "short_name": "case_clarity",
+    "name": "Case Clarity",
+    "short_name": "Case Clarity",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F7F5F0",
+    "theme_color": "#172B4D",
+    "description": "Understand your legal notice. Track your case.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

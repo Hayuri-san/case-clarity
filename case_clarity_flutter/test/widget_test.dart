@@ -4,7 +4,9 @@ import 'package:case_clarity/features/cases/case_screens.dart';
 import 'package:case_clarity/features/deadlines/deadline_screen.dart';
 import 'package:case_clarity/features/documents/date_suggestion_parser.dart';
 import 'package:case_clarity/features/lawyer_dashboard/lawyer_dashboard_screen.dart';
+import 'package:case_clarity/core/relative_time.dart';
 import 'package:case_clarity/providers/app_providers.dart';
+import 'package:case_clarity/widgets/app_components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,43 +22,92 @@ class _EmptySignedInController extends SignedInController {
 }
 
 void main() {
-  testWidgets('signed-out auth gate renders the existing sign-in surface', (tester) async {
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        signedInProvider.overrideWith(_SignedOutController.new),
-        signInScreenProvider.overrideWith((ref) => const Text('Sign in here')),
-      ],
-      child: const MaterialApp(home: AuthGate()),
-    ));
+  test('relative time uses the supplied clock deterministically', () {
+    final now = DateTime(2026, 4, 20, 12);
+    expect(
+      relativeTime(now.subtract(const Duration(minutes: 5)), now: now),
+      '5 minutes ago',
+    );
+    expect(relativeTime(now, now: now), 'just now');
+  });
+
+  testWidgets('status chip renders a resolved case state', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: StatusChip.forStage(CaseStage.resolved)),
+      ),
+    );
+    expect(find.text('Resolved'), findsOneWidget);
+  });
+
+  testWidgets('stage progress labels current case stages', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: StageProgress(stage: CaseStage.inProgress)),
+      ),
+    );
+    expect(find.text('Review'), findsOneWidget);
+    expect(find.text('In progress'), findsOneWidget);
+    expect(find.text('Documents'), findsOneWidget);
+    expect(find.text('Resolved'), findsOneWidget);
+  });
+
+  testWidgets('signed-out auth gate renders the existing sign-in surface', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          signedInProvider.overrideWith(_SignedOutController.new),
+          signInScreenProvider.overrideWith(
+            (ref) => const Text('Sign in here'),
+          ),
+        ],
+        child: const MaterialApp(home: AuthGate()),
+      ),
+    );
 
     expect(find.text('Sign in here'), findsOneWidget);
   });
 
-  testWidgets('role router shows the citizen and lawyer navigation with faked data', (tester) async {
-    final sharedOverrides = [
-      signedInProvider.overrideWith(_EmptySignedInController.new),
-      myCasesProvider.overrideWith((ref) async => <LegalCase>[]),
-      myProfileProvider.overrideWith((ref) async => null),
-      legalGuidesProvider.overrideWith((ref) async => <LegalGuide>[]),
-      recentLawyerUpdatesProvider.overrideWith((ref) async => <CaseUpdate>[]),
-      lawyerRecentActivityProvider.overrideWith((ref) async => <({LegalCase legalCase, CaseUpdate update})>[]),
-      caseUpdatesProvider.overrideWith((ref, caseId) async => <CaseUpdate>[]),
-      caseDocumentsProvider.overrideWith((ref, caseId) async => <CaseDocument>[]),
-    ];
+  testWidgets(
+    'role router shows the citizen and lawyer navigation with faked data',
+    (tester) async {
+      final sharedOverrides = [
+        signedInProvider.overrideWith(_EmptySignedInController.new),
+        myCasesProvider.overrideWith((ref) async => <LegalCase>[]),
+        myProfileProvider.overrideWith((ref) async => null),
+        legalGuidesProvider.overrideWith((ref) async => <LegalGuide>[]),
+        recentLawyerUpdatesProvider.overrideWith((ref) async => <CaseUpdate>[]),
+        lawyerRecentActivityProvider.overrideWith(
+          (ref) async => <({LegalCase legalCase, CaseUpdate update})>[],
+        ),
+        caseUpdatesProvider.overrideWith((ref, caseId) async => <CaseUpdate>[]),
+        caseDocumentsProvider.overrideWith(
+          (ref, caseId) async => <CaseDocument>[],
+        ),
+      ];
 
-    await tester.pumpWidget(ProviderScope(
-      overrides: sharedOverrides,
-      child: const MaterialApp(home: RoleRouter(role: UserRole.citizen)),
-    ));
-    expect(find.text('Home'), findsOneWidget);
-    await tester.pumpWidget(ProviderScope(
-      overrides: sharedOverrides,
-      child: const MaterialApp(home: RoleRouter(role: UserRole.lawyer)),
-    ));
-    expect(find.text('Dashboard'), findsOneWidget);
-  });
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: sharedOverrides,
+          child: const MaterialApp(home: RoleRouter(role: UserRole.citizen)),
+        ),
+      );
+      expect(find.text('Home'), findsOneWidget);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: sharedOverrides,
+          child: const MaterialApp(home: RoleRouter(role: UserRole.lawyer)),
+        ),
+      );
+      expect(find.text('Dashboard'), findsOneWidget);
+    },
+  );
 
-  testWidgets('date suggestion parser reads numeric and named dates', (tester) async {
+  testWidgets('date suggestion parser reads numeric and named dates', (
+    tester,
+  ) async {
     final parsed = parseDateSuggestions([
       '18/03/2026',
       '19-03-2026',
@@ -70,32 +121,44 @@ void main() {
     expect(parsed[3].text, 'date unclear');
   });
 
-  testWidgets('deadline results render due dates, badges, assumptions and disclaimer', (tester) async {
-    final result = Section138DeadlineResult(
-      items: [
-        DeadlineItem(
-          label: 'Send demand notice',
-          dueDate: DateTime.utc(2026, 4, 18),
-          basis: 'Within 30 days after dishonour information.',
-          status: DeadlineStatus.upcoming,
+  testWidgets(
+    'deadline results render due dates, badges, assumptions and disclaimer',
+    (tester) async {
+      final result = Section138DeadlineResult(
+        items: [
+          DeadlineItem(
+            label: 'Send demand notice',
+            dueDate: DateTime.utc(2026, 4, 18),
+            basis: 'Within 30 days after dishonour information.',
+            status: DeadlineStatus.upcoming,
+          ),
+          DeadlineItem(
+            label: 'Complaint filing',
+            basis: 'Notice receipt date is missing.',
+            status: DeadlineStatus.notYetComputable,
+          ),
+        ],
+        assumptions: const ['Dates are treated as confirmed.'],
+        disclaimer: 'Calculated from confirmed dates; not legal advice.',
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ListView(children: [DeadlineResults(result: result)]),
+          ),
         ),
-        DeadlineItem(
-          label: 'Complaint filing',
-          basis: 'Notice receipt date is missing.',
-          status: DeadlineStatus.notYetComputable,
-        ),
-      ],
-      assumptions: const ['Dates are treated as confirmed.'],
-      disclaimer: 'Calculated from confirmed dates; not legal advice.',
-    );
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(body: ListView(children: [DeadlineResults(result: result)])),
-    ));
+      );
 
-    expect(find.text('Send demand notice'), findsOneWidget);
-    expect(find.text('Upcoming'), findsOneWidget);
-    expect(find.text('Not yet computable'), findsOneWidget);
-    expect(find.text('Dates are treated as confirmed.'), findsOneWidget);
-    expect(find.text('Calculated from confirmed dates; not legal advice.'), findsOneWidget);
-  });
+      expect(find.text('Send demand notice'), findsOneWidget);
+      expect(find.text('Upcoming'), findsOneWidget);
+      expect(find.text('Not yet computable'), findsOneWidget);
+    await tester.tap(find.text('Assumptions and counting rules'));
+    await tester.pumpAndSettle();
+      expect(find.text('Dates are treated as confirmed.'), findsOneWidget);
+      expect(
+        find.text('Calculated from confirmed dates; not legal advice.'),
+        findsOneWidget,
+      );
+    },
+  );
 }

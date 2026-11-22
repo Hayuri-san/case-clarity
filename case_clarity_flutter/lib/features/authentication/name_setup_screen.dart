@@ -29,7 +29,10 @@ class _NameSetupScreenState extends ConsumerState<NameSetupScreen> {
       _error = null;
     });
     try {
-      await ref.read(clientProvider).profile.createOrUpdateMyProfile(_name.text.trim());
+      await ref
+          .read(clientProvider)
+          .profile
+          .createOrUpdateMyProfile(_name.text.trim());
       ref.invalidate(myProfileProvider);
     } catch (error) {
       setState(() => _error = friendlyError(error));
@@ -51,8 +54,10 @@ class _NameSetupScreenState extends ConsumerState<NameSetupScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('What should we call you?',
-                    style: Theme.of(context).textTheme.headlineMedium),
+                Text(
+                  'What should we call you?',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
                 const SizedBox(height: 8),
                 const Text('Your profile starts as a citizen account.'),
                 const SizedBox(height: 24),
@@ -67,13 +72,19 @@ class _NameSetupScreenState extends ConsumerState<NameSetupScreen> {
                   validator: (value) {
                     final name = value?.trim() ?? '';
                     if (name.isEmpty) return 'Enter your name.';
-                    if (name.length > 120) return 'Use 120 characters or fewer.';
+                    if (name.length > 120)
+                      return 'Use 120 characters or fewer.';
                     return null;
                   },
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 8),
-                  Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                  Text(
+                    _error!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
                 ],
                 const SizedBox(height: 12),
                 FilledButton(

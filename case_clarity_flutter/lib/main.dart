@@ -2,22 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'client.dart';
+import 'core/theme.dart';
 import 'features/authentication/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeClient();
   runApp(const ProviderScope(child: MyApp()));
-}
-
-/// Builds a theme for the given [brightness].
-ThemeData _buildTheme(Brightness brightness) {
-  return ThemeData(
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF176B62),
-      brightness: brightness,
-    ),
-  );
 }
 
 class MyApp extends StatelessWidget {
@@ -27,8 +18,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Case Clarity',
-      theme: _buildTheme(Brightness.light),
-      themeMode: ThemeMode.light,
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.system,
       home: const AuthGate(),
     );
   }
