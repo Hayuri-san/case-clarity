@@ -1,5 +1,9 @@
 import 'package:case_clarity_server/src/generated/legal_guide.dart';
+import 'package:case_clarity_server/src/generated/case_clarity_user_profile.dart';
 import 'package:case_clarity_server/src/services/legal_guide_seed.dart';
+import 'package:case_clarity_server/src/services/production_demo_seed.dart';
+import 'package:case_clarity_server/src/generated/user_role.dart';
+import 'package:serverpod/serverpod.dart';
 import 'package:test/test.dart';
 
 import 'test_tools/serverpod_test_tools.dart';
@@ -21,9 +25,14 @@ void main() {
         'consumer-complaint',
         'cyber-fraud',
       ]);
-      expect(guides.every((guide) => guide.disclaimer.endsWith(
-        'General information, not legal advice.',
-      )), isTrue);
+      expect(
+        guides.every(
+          (guide) => guide.disclaimer.endsWith(
+            'General information, not legal advice.',
+          ),
+        ),
+        isTrue,
+      );
 
       final guide = await endpoints.legalGuide.getGuide(
         signedIn,
@@ -68,18 +77,51 @@ void main() {
       );
     });
 
-    test('seeding twice updates existing rows without adding duplicates', () async {
-      final session = sessionBuilder.build();
-      await seedLegalGuides(session);
-      await seedLegalGuides(session);
+    test(
+      'seeding twice updates existing rows without adding duplicates',
+      () async {
+        final session = sessionBuilder.build();
+        await seedLegalGuides(session);
+        await seedLegalGuides(session);
 
-      final guides = await LegalGuide.db.find(session);
-      expect(guides, hasLength(3));
-      expect(guides.map((guide) => guide.slug).toSet(), {
-        'cheque-bounce',
-        'consumer-complaint',
-        'cyber-fraud',
-      });
-    });
+        final guides = await LegalGuide.db.find(session);
+        expect(guides, hasLength(3));
+        expect(guides.map((guide) => guide.slug).toSet(), {
+          'cheque-bounce',
+          'consumer-complaint',
+          'cyber-fraud',
+        });
+      },
+    );
+
+    test(
+      'production demo provisioning does nothing outside production',
+      () async {
+        final session = sessionBuilder.build();
+        const userId = '60000000-0000-4000-8000-000000000099';
+        await CaseClarityUserProfile.db.insertRow(
+          session,
+          CaseClarityUserProfile(
+            userId: UuidValue.fromString(userId),
+            fullName: 'Configured user',
+            role: UserRole.citizen,
+          ),
+        );
+
+        await provisionProductionDemoData(session);
+
+        final profile = await CaseClarityUserProfile.db.findFirstRow(
+          session,
+          where: (table) => table.userId.equals(UuidValue.fromString(userId)),
+        );
+        expect(profile?.role, UserRole.citizen);
+        expect(productionLawyerEmails('test', 'trusted@example.com'), isEmpty);
+        expect(productionLawyerEmails('production', null), isEmpty);
+        expect(
+          productionLawyerEmails('production', 'trusted@example.com'),
+          ['trusted@example.com'],
+        );
+      },
+    );
   });
 }

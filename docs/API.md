@@ -50,11 +50,24 @@ Documents use Serverpod's private storage. Uploads are limited by
 `maxDocumentSizeBytes` (5 MiB) and `maxRequestSize` is set to the same size in
 each run-mode config so local database-backed uploads are accepted. The server
 checks the stored file size and PDF/JPG/PNG magic bytes before accepting it.
-OCR uses the offline `MockOcrProvider`; `finishUpload` queues background work
-and returns while the document is `processing`. Clients can poll
+OCR uses `GeminiOcrProvider` when the `geminiApiKey` password is configured,
+and falls back to `MockOcrProvider` when it is absent. `finishUpload` queues
+background work and returns while the document is `processing`. Provider
+failures save a generic error without exposing provider details. Clients can poll
 `document.getDocument` for `completed` or `failed`. Candidate dates are
 suggestions for the citizen to confirm. `storagePath` is server-only and
 document text is never logged.
+
+The documents screen can capture a notice with the device camera or use the
+existing file picker. Camera capture is best-effort on Flutter web: browsers
+may show a camera capture option, but the browser and device control whether it
+is available. The file picker remains available as a fallback. Captured images
+are resized before upload and remain subject to the server's 5 MiB check.
+
+In production, only email addresses configured in `demoLawyerEmails` are
+promoted at startup. If `demoCitizenEmail` is also configured and that account
+exists, an idempotent sample case is created for it. Missing secret values
+perform no promotion or demo-case creation; clients cannot change their role.
 
 ## Which call does each screen use
 

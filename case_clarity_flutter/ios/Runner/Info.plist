@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Case Clarity uses your camera to scan a legal notice for text and dates.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Case Clarity lets you choose a notice image when camera access is unavailable.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

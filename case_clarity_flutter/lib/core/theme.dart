@@ -7,6 +7,39 @@ abstract final class CaseClarityColors {
   static const amber = Color(0xFF9A5B00);
   static const red = Color(0xFFB3261E);
   static const green = Color(0xFF246B45);
+  static const dueSoon = Color(0xFFE6A33A);
+  static const passed = Color(0xFFB9413A);
+  static const resolved = Color(0xFF3F9B72);
+  static const heroGradient = [
+    Color(0xFF142746),
+    Color(0xFF145C67),
+    Color(0xFF137C78),
+  ];
+  static const darkGradient = [
+    Color(0xFF101927),
+    Color(0xFF18333B),
+    Color(0xFF164A4B),
+  ];
+}
+
+abstract final class CaseClarityMotion {
+  static const entrance = Duration(milliseconds: 420);
+  static const counter = Duration(milliseconds: 900);
+  static const micro = Duration(milliseconds: 180);
+  static const curve = Curves.easeOutCubic;
+}
+
+abstract final class CaseClarityDecor {
+  static List<BoxShadow> cardShadow(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return [
+      BoxShadow(
+        color: CaseClarityColors.navy.withValues(alpha: dark ? .22 : .08),
+        blurRadius: 26,
+        offset: const Offset(0, 12),
+      ),
+    ];
+  }
 }
 
 abstract final class AppSpacing {

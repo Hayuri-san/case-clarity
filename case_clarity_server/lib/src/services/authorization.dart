@@ -50,7 +50,9 @@ class Authorization {
     };
   }
 
-  static Future<({UuidValue userId, CaseClarityUserProfile profile, LegalCase legalCase})>
+  static Future<
+    ({UuidValue userId, CaseClarityUserProfile profile, LegalCase legalCase})
+  >
   requireCaseAccess(Session session, int caseId) async {
     final signedIn = await getSignedInUserAndProfile(session);
     final legalCase = await LegalCase.db.findById(session, caseId);

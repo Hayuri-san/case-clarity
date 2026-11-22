@@ -4,13 +4,9 @@ import 'package:case_clarity_client/case_clarity_client.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 
-/// Change this one value for your target device. Chrome on this PC uses
-/// localhost; Android emulators use http://10.0.2.2:8080/; a real phone uses
-/// this PC's LAN IP, for example http://192.168.1.20:8080/.
-const serverUrl = String.fromEnvironment(
-  'SERVER_URL',
-  defaultValue: 'http://localhost:8080/',
-);
+/// Uses SERVER_URL when supplied, otherwise the runtime config served by
+/// Serverpod Cloud, then the local development fallback.
+final serverUrl = getServerUrl();
 
 /// Sets up a global client object that can be used to talk to the server from
 /// anywhere in our app. The client is generated from your server code

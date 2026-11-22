@@ -1,0 +1,6 @@
+# Never upload local credentials.
+config/passwords.yaml
+
+# Serverpod runs the Flutter build hook before uploading this directory.
+!web/app/
+!web/app/**

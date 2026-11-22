@@ -1,6 +1,7 @@
 import 'package:case_clarity_client/case_clarity_client.dart';
 import 'package:case_clarity/features/authentication/auth_gate.dart';
 import 'package:case_clarity/features/cases/case_screens.dart';
+import 'package:case_clarity/core/app_frame.dart';
 import 'package:case_clarity/features/deadlines/deadline_screen.dart';
 import 'package:case_clarity/features/documents/date_suggestion_parser.dart';
 import 'package:case_clarity/features/lawyer_dashboard/lawyer_dashboard_screen.dart';
@@ -22,6 +23,79 @@ class _EmptySignedInController extends SignedInController {
 }
 
 void main() {
+  testWidgets('AppFrame constrains a wide browser to phone width', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        builder: (context, child) => AppFrame(
+          child: child ?? const SizedBox.shrink(),
+        ),
+        home: Builder(
+          builder: (context) => SizedBox(
+            key: const ValueKey('frame-width'),
+            width: MediaQuery.sizeOf(context).width,
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      tester.getSize(find.byKey(const ValueKey('frame-width'))).width,
+      430,
+    );
+
+    tester.view.physicalSize = const Size(360, 800);
+    await tester.pump();
+    expect(
+      tester.getSize(find.byKey(const ValueKey('frame-width'))).width,
+      360,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'citizen navigation stays in phone layout at wide and narrow widths',
+    (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1440, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final overrides = [
+        myCasesProvider.overrideWith((ref) async => <LegalCase>[]),
+        myProfileProvider.overrideWith((ref) async => null),
+        legalGuidesProvider.overrideWith((ref) async => <LegalGuide>[]),
+        recentLawyerUpdatesProvider.overrideWith((ref) async => <CaseUpdate>[]),
+      ];
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: overrides,
+          child: MaterialApp(
+            builder: (context, child) => AppFrame(
+              child: child ?? const SizedBox.shrink(),
+            ),
+            home: const MainShell(role: UserRole.citizen),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(NavigationRail), findsNothing);
+      expect(tester.takeException(), isNull);
+
+      tester.view.physicalSize = const Size(360, 800);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   test('relative time uses the supplied clock deterministically', () {
     final now = DateTime(2026, 4, 20, 12);
     expect(
@@ -152,8 +226,8 @@ void main() {
       expect(find.text('Send demand notice'), findsOneWidget);
       expect(find.text('Upcoming'), findsOneWidget);
       expect(find.text('Not yet computable'), findsOneWidget);
-    await tester.tap(find.text('Assumptions and counting rules'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Assumptions and counting rules'));
+      await tester.pumpAndSettle();
       expect(find.text('Dates are treated as confirmed.'), findsOneWidget);
       expect(
         find.text('Calculated from confirmed dates; not legal advice.'),

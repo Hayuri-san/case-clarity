@@ -122,7 +122,9 @@ class DevEndpoint extends Endpoint {
     );
     if (profile != null) {
       if (profile.role != role) {
-        throw StateError('The selected citizen already has a non-citizen role.');
+        throw StateError(
+          'The selected citizen already has a non-citizen role.',
+        );
       }
       return profile;
     }
@@ -137,7 +139,10 @@ class DevEndpoint extends Endpoint {
     );
   }
 
-  Future<UserProfileModel> _findAuthProfile(Session session, String email) async {
+  Future<UserProfileModel> _findAuthProfile(
+    Session session,
+    String email,
+  ) async {
     final normalizedEmail = email.trim().toLowerCase();
     if (normalizedEmail.isEmpty) {
       throw ArgumentError('Email must not be empty.');

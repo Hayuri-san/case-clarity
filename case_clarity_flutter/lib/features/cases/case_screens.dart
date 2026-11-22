@@ -6,9 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 import '../../core/date_format.dart';
+import '../../core/theme.dart';
 import '../../core/relative_time.dart';
 import '../../providers/app_providers.dart';
 import '../../widgets/app_components.dart';
+import '../../widgets/visual_components.dart';
 import '../../widgets/async_content.dart';
 import '../documents/document_screens.dart';
 import '../legal_guides/legal_guide_screens.dart';
@@ -49,14 +51,46 @@ class CitizenHomeScreen extends ConsumerWidget {
       children: [
         Text(greeting, style: Theme.of(context).textTheme.titleMedium),
         profile.when(
-          loading: () => const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8),
-            child: LinearProgressIndicator(),
-          ),
-          error: (error, stack) => Text(friendlyError(error)),
-          data: (item) => Text(
-            item?.fullName ?? 'there',
-            style: Theme.of(context).textTheme.headlineMedium,
+          loading: () => const SkeletonLoader(rows: 1),
+          error: (error, stack) => ErrorState(message: friendlyError(error)),
+          data: (item) => Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(colors: CaseClarityColors.heroGradient),
+              borderRadius: BorderRadius.circular(26),
+              boxShadow: CaseClarityDecor.cardShadow(context),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        greeting,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(color: Colors.white70),
+                      ),
+                      Text(
+                        item?.fullName ?? 'there',
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(color: Colors.white),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Your legal journey, clearly organized.',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.wb_sunny_rounded,
+                  color: Color(0xFFFFD36E),
+                  size: 42,
+                ),
+              ],
+            ),
           ),
         ),
         const SizedBox(height: 20),
@@ -85,7 +119,31 @@ class CitizenHomeScreen extends ConsumerWidget {
                   '$active active cases',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                subtitle: Text('$resolved resolved · ${items.length} total'),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('$resolved resolved · ${items.length} total'),
+                    if (items.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      CaseStageDonut(
+                        counts: {
+                          for (final stage in CaseStage.values)
+                            stage: items
+                                .where((item) => item.stage == stage)
+                                .length,
+                        },
+                      ),
+                      CaseTypeStack(
+                        counts: {
+                          for (final type in CaseType.values)
+                            type.name: items
+                                .where((item) => item.caseType == type)
+                                .length,
+                        },
+                      ),
+                    ],
+                  ],
+                ),
                 trailing: const Icon(Icons.arrow_forward),
                 onTap: () => _openCases(context),
               ),
@@ -230,32 +288,44 @@ class SelectCaseForUploadScreen extends ConsumerWidget {
           message: friendlyError(error),
           onRetry: () => ref.invalidate(myCasesProvider),
         ),
-        data: (items) => items.isEmpty
-            ? const EmptyPanel(
-                message: 'Create a case before uploading a notice.',
+        data: (items) => ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            if (items.isEmpty)
+              const EmptyPanel(
+                message: 'Create a case before scanning a notice.',
               )
-            : ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  final legalCase = items[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text(legalCase.title),
-                      subtitle: Text(stageLabel(legalCase.stage.name)),
-                      trailing: const Icon(Icons.upload_file),
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => CaseDetailScreen(
-                            legalCase: legalCase,
-                            initialTab: 2,
-                          ),
+            else
+              for (final legalCase in items)
+                Card(
+                  child: ListTile(
+                    title: Text(legalCase.title),
+                    subtitle: Text(stageLabel(legalCase.stage.name)),
+                    trailing: const Icon(Icons.document_scanner_outlined),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => CaseDetailScreen(
+                          legalCase: legalCase,
+                          initialTab: 2,
+                          startCameraScan: true,
                         ),
                       ),
                     ),
-                  );
-                },
+                  ),
+                ),
+            OutlinedButton.icon(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const CreateCaseScreen(
+                    startCameraScanAfterCreate: true,
+                  ),
+                ),
               ),
+              icon: const Icon(Icons.add),
+              label: const Text('Create a case first'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -382,8 +452,13 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
 }
 
 class CreateCaseScreen extends ConsumerStatefulWidget {
-  const CreateCaseScreen({super.key, this.initialCaseType});
+  const CreateCaseScreen({
+    super.key,
+    this.initialCaseType,
+    this.startCameraScanAfterCreate = false,
+  });
   final CaseType? initialCaseType;
+  final bool startCameraScanAfterCreate;
 
   @override
   ConsumerState<CreateCaseScreen> createState() => _CreateCaseScreenState();
@@ -424,7 +499,11 @@ class _CreateCaseScreenState extends ConsumerState<CreateCaseScreen> {
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute<void>(
-          builder: (_) => CaseDetailScreen(legalCase: created),
+          builder: (_) => CaseDetailScreen(
+            legalCase: created,
+            initialTab: widget.startCameraScanAfterCreate ? 2 : 0,
+            startCameraScan: widget.startCameraScanAfterCreate,
+          ),
         ),
       );
     } catch (error) {
@@ -586,9 +665,11 @@ class CaseDetailScreen extends ConsumerWidget {
     super.key,
     required this.legalCase,
     this.initialTab = 0,
+    this.startCameraScan = false,
   });
   final LegalCase legalCase;
   final int initialTab;
+  final bool startCameraScan;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -639,7 +720,10 @@ class CaseDetailScreen extends ConsumerWidget {
                   children: [
                     _CaseOverview(legalCase: item),
                     TimelinePanel(caseId: item.id!),
-                    DocumentListScreen(caseId: item.id!),
+                    DocumentListScreen(
+                      caseId: item.id!,
+                      startCameraScan: startCameraScan,
+                    ),
                   ],
                 ),
               ),
@@ -763,54 +847,61 @@ class _TimelinePanelState extends ConsumerState<TimelinePanel> {
               itemBuilder: (context, index) {
                 final update = items[index];
                 final stageChange = update.kind == CaseUpdateKind.stageChange;
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: AppCard(
-                    color: stageChange
-                        ? Theme.of(context).colorScheme.secondaryContainer
-                        : null,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          stageChange
-                              ? Icons.sync_alt
-                              : Icons.chat_bubble_outline,
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                update.title,
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(update.description),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Text(
-                                    stageChange
-                                        ? 'Stage change'
-                                        : 'Lawyer update',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.labelMedium,
-                                  ),
-                                  const Text(' · '),
-                                  Tooltip(
-                                    message: '${update.createdAt}',
-                                    child: Text(relativeTime(update.createdAt)),
-                                  ),
-                                ],
-                              ),
-                            ],
+                return FadeSlideIn(
+                  index: index,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: AppCard(
+                      color: stageChange
+                          ? Theme.of(context).colorScheme.secondaryContainer
+                          : null,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            stageChange
+                                ? Icons.sync_alt
+                                : Icons.chat_bubble_outline,
+                            color: Theme.of(context).colorScheme.secondary,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  update.title,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(update.description),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Text(
+                                      stageChange
+                                          ? 'Stage change'
+                                          : 'Lawyer update',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.labelMedium,
+                                    ),
+                                    const Text(' · '),
+                                    Tooltip(
+                                      message: '${update.createdAt}',
+                                      child: Text(
+                                        relativeTime(update.createdAt),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );

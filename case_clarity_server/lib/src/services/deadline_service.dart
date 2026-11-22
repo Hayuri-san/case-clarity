@@ -5,11 +5,16 @@ import '../generated/section138_deadline_result.dart';
 const section138Disclaimer =
     'Calculated from the dates you confirmed; not legal advice; courts can condone delay; confirm with a lawyer.';
 
-DateTime _dateOnly(DateTime date) => DateTime.utc(date.year, date.month, date.day);
+DateTime _dateOnly(DateTime date) =>
+    DateTime.utc(date.year, date.month, date.day);
 
 void _requireDateOnlyUtc(DateTime date, String name) {
-  if (!date.isUtc || date.hour != 0 || date.minute != 0 || date.second != 0 ||
-      date.millisecond != 0 || date.microsecond != 0) {
+  if (!date.isUtc ||
+      date.hour != 0 ||
+      date.minute != 0 ||
+      date.second != 0 ||
+      date.millisecond != 0 ||
+      date.microsecond != 0) {
     throw ArgumentError('$name must be a UTC date at midnight.');
   }
 }
@@ -141,13 +146,15 @@ Section138DeadlineResult calculateSection138Deadlines({
     DeadlineItem(
       label: 'Present cheque',
       dueDate: presentationDeadline,
-      basis: 'Within three calendar months from the cheque date, or earlier validity if supplied. $presentationOutcome',
+      basis:
+          'Within three calendar months from the cheque date, or earlier validity if supplied. $presentationOutcome',
       status: deadlineStatus(today, presentationDeadline),
     ),
     DeadlineItem(
       label: 'Send demand notice',
       dueDate: noticeDeadline,
-      basis: 'Within 30 days after dishonour information from the bank.$noticeRecord',
+      basis:
+          'Within 30 days after dishonour information from the bank.$noticeRecord',
       status: deadlineStatus(today, noticeDeadline),
     ),
   ];
@@ -163,12 +170,15 @@ Section138DeadlineResult calculateSection138Deadlines({
       DeadlineItem(
         label: 'Complaint filing deadline',
         dueDate: null,
-        basis: 'Cannot calculate until the notice receipt date and resulting payment deadline are known.',
+        basis:
+            'Cannot calculate until the notice receipt date and resulting payment deadline are known.',
         status: DeadlineStatus.notYetComputable,
       ),
     ]);
   } else {
-    final paymentDeadline = paymentDeadlineAfterNoticeReceipt(noticeReceivedDate);
+    final paymentDeadline = paymentDeadlineAfterNoticeReceipt(
+      noticeReceivedDate,
+    );
     final complaintDeadline = complaintFilingDeadlineAfterPaymentWindow(
       paymentDeadline,
     );
@@ -176,13 +186,15 @@ Section138DeadlineResult calculateSection138Deadlines({
       DeadlineItem(
         label: 'Drawer payment period ends',
         dueDate: paymentDeadline,
-        basis: '15 days after receipt of the demand notice; receipt day is excluded.',
+        basis:
+            '15 days after receipt of the demand notice; receipt day is excluded.',
         status: deadlineStatus(today, paymentDeadline),
       ),
       DeadlineItem(
         label: 'Complaint filing deadline',
         dueDate: complaintDeadline,
-        basis: 'One month after the 15-day payment period ends, using the earlier of a calendar month and 30 days.',
+        basis:
+            'One month after the 15-day payment period ends, using the earlier of a calendar month and 30 days.',
         status: deadlineStatus(today, complaintDeadline),
       ),
     ]);

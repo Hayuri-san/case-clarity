@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:serverpod_client/serverpod_client.dart';
 
 import '../../core/date_format.dart';
@@ -17,8 +18,13 @@ import 'date_suggestion_parser.dart';
 const _maxUploadBytes = 5 * 1024 * 1024;
 
 class DocumentListScreen extends ConsumerStatefulWidget {
-  const DocumentListScreen({super.key, required this.caseId});
+  const DocumentListScreen({
+    super.key,
+    required this.caseId,
+    this.startCameraScan = false,
+  });
   final int caseId;
+  final bool startCameraScan;
 
   @override
   ConsumerState<DocumentListScreen> createState() => _DocumentListScreenState();
@@ -26,7 +32,18 @@ class DocumentListScreen extends ConsumerStatefulWidget {
 
 class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
   bool _uploading = false;
+  bool _cameraUnavailable = false;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.startCameraScan) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _captureAndUpload();
+      });
+    }
+  }
 
   Future<void> _chooseAndUpload() async {
     setState(() {
@@ -66,48 +83,7 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
           'The selected file could not be read. Please choose it again.',
         );
       }
-      final client = ref.read(clientProvider);
-      final ticket = await client.document.startUpload(
-        widget.caseId,
-        name,
-        mimeType,
-        size,
-      );
-      final uploaded = await FileUploader(ticket.uploadDescription)
-          .uploadByteData(
-            ByteData.sublistView(bytes),
-          );
-      if (!uploaded)
-        throw const FormatException(
-          'The upload did not finish. Please try again.',
-        );
-
-      await client.document.finishUpload(ticket.documentId);
-      CaseDocument? finalDocument;
-      for (var attempt = 0; attempt < 30; attempt++) {
-        await Future<void>.delayed(const Duration(seconds: 2));
-        finalDocument = await client.document.getDocument(ticket.documentId);
-        if (finalDocument.ocrStatus == DocumentOcrStatus.completed ||
-            finalDocument.ocrStatus == DocumentOcrStatus.failed) {
-          break;
-        }
-      }
-      ref.invalidate(caseDocumentsProvider(widget.caseId));
-      if (!mounted) return;
-      if (finalDocument == null ||
-          finalDocument.ocrStatus == DocumentOcrStatus.processing ||
-          finalDocument.ocrStatus == DocumentOcrStatus.pending) {
-        setState(
-          () => _error =
-              'This document is taking longer than expected. You can check it again in the documents list.',
-        );
-        return;
-      }
-      await Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (_) => OcrReviewScreen(document: finalDocument!),
-        ),
-      );
+      await _uploadBytes(name, mimeType, bytes);
     } catch (error) {
       if (mounted)
         setState(
@@ -118,6 +94,132 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
     } finally {
       if (mounted) setState(() => _uploading = false);
     }
+  }
+
+  Future<void> _captureAndUpload() async {
+    setState(() {
+      _uploading = true;
+      _cameraUnavailable = false;
+      _error = null;
+    });
+    try {
+      final picker = ImagePicker();
+      XFile? photo;
+      var approved = false;
+      while (!approved) {
+        photo = await picker.pickImage(
+          source: ImageSource.camera,
+          maxWidth: 2000,
+          maxHeight: 2000,
+          imageQuality: 82,
+        );
+        if (photo == null) return;
+        final bytes = await photo.readAsBytes();
+        if (bytes.lengthInBytes > _maxUploadBytes) {
+          throw const FormatException(
+            'This photo is still larger than 5 MB. Retake it closer or use a smaller image.',
+          );
+        }
+        if (!mounted) return;
+        final usePhoto = await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+            title: const Text('Review your scan'),
+            content: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 420),
+              child: Image.memory(bytes, fit: BoxFit.contain),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('Retake'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: const Text('Use photo'),
+              ),
+            ],
+          ),
+        );
+        if (usePhoto == null) return;
+        approved = usePhoto;
+      }
+      final capturedPhoto = photo;
+      if (capturedPhoto == null) return;
+      final bytes = await capturedPhoto.readAsBytes();
+      await _uploadBytes('notice-scan.jpg', 'image/jpeg', bytes);
+    } catch (error) {
+      if (mounted) {
+        if (error is PlatformException ||
+            error is MissingPluginException ||
+            error is UnsupportedError) {
+          setState(() {
+            _cameraUnavailable = true;
+            _error =
+                'Camera access is unavailable. You can choose a notice file instead.';
+          });
+        } else {
+          setState(
+            () => _error = error is FormatException
+                ? error.message
+                : friendlyError(error),
+          );
+        }
+      }
+    } finally {
+      if (mounted) setState(() => _uploading = false);
+    }
+  }
+
+  Future<void> _uploadBytes(
+    String name,
+    String mimeType,
+    Uint8List bytes,
+  ) async {
+    if (bytes.isEmpty || bytes.lengthInBytes > _maxUploadBytes) {
+      throw const FormatException('Choose an image smaller than 5 MB.');
+    }
+    final client = ref.read(clientProvider);
+    final ticket = await client.document.startUpload(
+      widget.caseId,
+      name,
+      mimeType,
+      bytes.lengthInBytes,
+    );
+    final uploaded = await FileUploader(
+      ticket.uploadDescription,
+    ).uploadByteData(ByteData.sublistView(bytes));
+    if (!uploaded) {
+      throw const FormatException(
+        'The upload did not finish. Please try again.',
+      );
+    }
+    await client.document.finishUpload(ticket.documentId);
+    CaseDocument? finalDocument;
+    for (var attempt = 0; attempt < 30; attempt++) {
+      await Future<void>.delayed(const Duration(seconds: 2));
+      finalDocument = await client.document.getDocument(ticket.documentId);
+      if (finalDocument.ocrStatus == DocumentOcrStatus.completed ||
+          finalDocument.ocrStatus == DocumentOcrStatus.failed) {
+        break;
+      }
+    }
+    ref.invalidate(caseDocumentsProvider(widget.caseId));
+    if (!mounted) return;
+    if (finalDocument == null ||
+        finalDocument.ocrStatus == DocumentOcrStatus.processing ||
+        finalDocument.ocrStatus == DocumentOcrStatus.pending) {
+      setState(
+        () => _error =
+            'This document is taking longer than expected. You can check it again in the documents list.',
+      );
+      return;
+    }
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => OcrReviewScreen(document: finalDocument!),
+      ),
+    );
   }
 
   @override
@@ -138,6 +240,12 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
                     ? 'Uploading and reading notice…'
                     : 'Upload a notice',
               ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: _uploading ? null : _captureAndUpload,
+                icon: const Icon(Icons.photo_camera_outlined),
+                label: const Text('Scan with camera'),
+              ),
               if (_uploading) ...[
                 const SizedBox(height: 8),
                 const LinearProgressIndicator(),
@@ -156,6 +264,12 @@ class _DocumentListScreenState extends ConsumerState<DocumentListScreen> {
                       color: Theme.of(context).colorScheme.error,
                     ),
                   ),
+                ),
+              if (_cameraUnavailable)
+                TextButton.icon(
+                  onPressed: _uploading ? null : _chooseAndUpload,
+                  icon: const Icon(Icons.folder_open_outlined),
+                  label: const Text('Choose a file instead'),
                 ),
             ],
           ),

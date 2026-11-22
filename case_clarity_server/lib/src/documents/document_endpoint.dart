@@ -100,7 +100,8 @@ class DocumentEndpoint extends Endpoint {
       storageId: _privateStorageId,
       path: storagePath,
     );
-    if (!verified) throw StateError('The uploaded file is missing or incomplete.');
+    if (!verified)
+      throw StateError('The uploaded file is missing or incomplete.');
 
     final stat = await session.storage.statFile(
       storageId: _privateStorageId,
@@ -108,7 +109,9 @@ class DocumentEndpoint extends Endpoint {
     );
     if (stat.size != document.sizeBytes || stat.size > maxDocumentSizeBytes) {
       await _discardRejectedUpload(session, document);
-      throw ArgumentError('The uploaded file size does not match its declaration.');
+      throw ArgumentError(
+        'The uploaded file size does not match its declaration.',
+      );
     }
 
     final bytes = await session.storage.retrieveFile(
@@ -152,23 +155,35 @@ class DocumentEndpoint extends Endpoint {
     return document;
   }
 
-  String _validateUploadDetails(String fileName, String mimeType, int sizeBytes) {
+  String _validateUploadDetails(
+    String fileName,
+    String mimeType,
+    int sizeBytes,
+  ) {
     final name = fileName.trim();
-    if (name.isEmpty || name.length > 255 || name.contains('/') || name.contains('\\')) {
-      throw ArgumentError('File name must be between 1 and 255 characters without a path.');
+    if (name.isEmpty ||
+        name.length > 255 ||
+        name.contains('/') ||
+        name.contains('\\')) {
+      throw ArgumentError(
+        'File name must be between 1 and 255 characters without a path.',
+      );
     }
     if (sizeBytes <= 0 || sizeBytes > maxDocumentSizeBytes) {
       throw ArgumentError('File size must be between 1 byte and 5 MiB.');
     }
 
-    final extension = name.contains('.') ? name.split('.').last.toLowerCase() : '';
+    final extension = name.contains('.')
+        ? name.split('.').last.toLowerCase()
+        : '';
     final expectedMimeType = switch (extension) {
       'pdf' => 'application/pdf',
       'jpg' || 'jpeg' => 'image/jpeg',
       'png' => 'image/png',
       _ => null,
     };
-    if (expectedMimeType == null || mimeType.toLowerCase() != expectedMimeType) {
+    if (expectedMimeType == null ||
+        mimeType.toLowerCase() != expectedMimeType) {
       throw ArgumentError('Only PDF, JPG, and PNG files are supported.');
     }
     return name;
@@ -194,11 +209,18 @@ class DocumentEndpoint extends Endpoint {
   }
 }
 
-Future<void> _processOcrInBackground(Serverpod serverpod, int documentId) async {
+Future<void> _processOcrInBackground(
+  Serverpod serverpod,
+  int documentId,
+) async {
   Session? backgroundSession;
   try {
     backgroundSession = await serverpod.createSession();
-    await const OcrService(MockOcrProvider()).processDocument(
+    final apiKey = backgroundSession.serverpod.getPassword('geminiApiKey');
+    final provider = apiKey == null || apiKey.trim().isEmpty
+        ? const MockOcrProvider()
+        : GeminiOcrProvider(apiKey: apiKey);
+    await OcrService(provider).processDocument(
       backgroundSession,
       documentId,
     );

@@ -108,7 +108,9 @@ void main() {
               isNotNull,
             );
           }
-          await _expectUnauthenticated(endpoints.profile.getMyProfile(anonymous));
+          await _expectUnauthenticated(
+            endpoints.profile.getMyProfile(anonymous),
+          );
           await _expectUnauthenticated(
             endpoints.profile.createOrUpdateMyProfile(anonymous, 'Anonymous'),
           );
@@ -124,10 +126,14 @@ void main() {
             legalCase.copyWith(assignedLawyerId: assignedProfile.userId),
           );
 
-          expect((await endpoints.cases.getCase(citizen, legalCase.id!)).id,
-              legalCase.id);
-          expect((await endpoints.cases.getCase(assignedLawyer, legalCase.id!)).id,
-              legalCase.id);
+          expect(
+            (await endpoints.cases.getCase(citizen, legalCase.id!)).id,
+            legalCase.id,
+          );
+          expect(
+            (await endpoints.cases.getCase(assignedLawyer, legalCase.id!)).id,
+            legalCase.id,
+          );
           await _expectCaseDenied(
             endpoints.cases.getCase(unrelatedCitizen, legalCase.id!),
           );
@@ -155,7 +161,12 @@ void main() {
             ),
           );
           await _expectUnauthenticated(
-            endpoints.cases.updateCaseInfo(anonymous, legalCase.id!, 'Title', ''),
+            endpoints.cases.updateCaseInfo(
+              anonymous,
+              legalCase.id!,
+              'Title',
+              '',
+            ),
           );
           final changedCase = await endpoints.cases.updateCaseInfo(
             citizen,
@@ -205,7 +216,9 @@ void main() {
             );
             expect(result.items, isNotEmpty);
           }
-          await _expectUnauthenticated(endpoints.legalGuide.listGuides(anonymous));
+          await _expectUnauthenticated(
+            endpoints.legalGuide.listGuides(anonymous),
+          );
           await _expectUnauthenticated(
             endpoints.legalGuide.getGuide(anonymous, 'cheque-bounce'),
           );
@@ -238,7 +251,10 @@ void main() {
             isNotEmpty,
           );
           expect(
-            (await endpoints.caseUpdate.listUpdates(assignedLawyer, legalCase.id!)),
+            (await endpoints.caseUpdate.listUpdates(
+              assignedLawyer,
+              legalCase.id!,
+            )),
             isNotEmpty,
           );
           await _expectNotAuthorized(
@@ -309,13 +325,21 @@ void main() {
             document.id,
           );
           expect(
-            (await endpoints.document.getDocument(assignedLawyer, document.id!)).id,
+            (await endpoints.document.getDocument(
+              assignedLawyer,
+              document.id!,
+            )).id,
             document.id,
           );
-          expect(await endpoints.document.listDocuments(citizen, legalCase.id!),
-              hasLength(1));
           expect(
-            await endpoints.document.listDocuments(assignedLawyer, legalCase.id!),
+            await endpoints.document.listDocuments(citizen, legalCase.id!),
+            hasLength(1),
+          );
+          expect(
+            await endpoints.document.listDocuments(
+              assignedLawyer,
+              legalCase.id!,
+            ),
             hasLength(1),
           );
           await _expectCaseDenied(

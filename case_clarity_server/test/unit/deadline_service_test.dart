@@ -42,20 +42,23 @@ void main() {
       );
     });
 
-    test('missing notice receipt leaves payment and filing deadlines unknown', () {
-      final result = calculateSection138Deadlines(
-        today: day(2025, 1, 1),
-        chequeDate: day(2024, 12, 1),
-        chequePresentedDate: day(2024, 12, 2),
-        dishonourIntimationDate: day(2024, 12, 3),
-      );
-      expect(result.items[1].dueDate, day(2025, 1, 2));
-      expect(result.items[1].basis, contains('No notice-sent date'));
-      expect(result.items[2].status, DeadlineStatus.notYetComputable);
-      expect(result.items[2].dueDate, isNull);
-      expect(result.items[3].status, DeadlineStatus.notYetComputable);
-      expect(result.disclaimer, section138Disclaimer);
-    });
+    test(
+      'missing notice receipt leaves payment and filing deadlines unknown',
+      () {
+        final result = calculateSection138Deadlines(
+          today: day(2025, 1, 1),
+          chequeDate: day(2024, 12, 1),
+          chequePresentedDate: day(2024, 12, 2),
+          dishonourIntimationDate: day(2024, 12, 3),
+        );
+        expect(result.items[1].dueDate, day(2025, 1, 2));
+        expect(result.items[1].basis, contains('No notice-sent date'));
+        expect(result.items[2].status, DeadlineStatus.notYetComputable);
+        expect(result.items[2].dueDate, isNull);
+        expect(result.items[3].status, DeadlineStatus.notYetComputable);
+        expect(result.disclaimer, section138Disclaimer);
+      },
+    );
 
     test('complaint deadline clamps month end after payment window', () {
       final paymentEnds = paymentDeadlineAfterNoticeReceipt(day(2025, 1, 17));
@@ -82,11 +85,13 @@ void main() {
           chequePresentedDate: day(2025, 1, 1),
           dishonourIntimationDate: day(2025, 1, 3),
         ),
-        throwsA(isA<ArgumentError>().having(
-          (error) => error.message,
-          'message',
-          contains('chequePresentedDate must be on or after chequeDate'),
-        )),
+        throwsA(
+          isA<ArgumentError>().having(
+            (error) => error.message,
+            'message',
+            contains('chequePresentedDate must be on or after chequeDate'),
+          ),
+        ),
       );
       expect(
         () => calculateSection138Deadlines(
@@ -95,11 +100,13 @@ void main() {
           chequePresentedDate: day(2024, 12, 2),
           dishonourIntimationDate: day(2024, 12, 3),
         ),
-        throwsA(isA<ArgumentError>().having(
-          (error) => error.message,
-          'message',
-          contains('today must be a UTC date at midnight'),
-        )),
+        throwsA(
+          isA<ArgumentError>().having(
+            (error) => error.message,
+            'message',
+            contains('today must be a UTC date at midnight'),
+          ),
+        ),
       );
     });
   });

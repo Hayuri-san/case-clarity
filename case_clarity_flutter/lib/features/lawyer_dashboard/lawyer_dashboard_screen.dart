@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/date_format.dart';
 import '../../providers/app_providers.dart';
 import '../../widgets/app_components.dart';
+import '../../widgets/visual_components.dart';
 import '../../widgets/async_content.dart';
 import '../cases/case_screens.dart';
 
@@ -46,29 +47,57 @@ class LawyerDashboardScreen extends ConsumerWidget {
             message: friendlyError(error),
             onRetry: () => ref.invalidate(myCasesProvider),
           ),
-          data: (items) => Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: CaseStage.values.map((stage) {
-              final count = items.where((item) => item.stage == stage).length;
-              return SizedBox(
-                width: 170,
-                child: AppCard(
-                  color: Theme.of(context).colorScheme.secondaryContainer,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$count',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 4),
-                      StatusChip.forStage(stage),
-                    ],
-                  ),
+          data: (items) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Cases by stage',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 12),
+                    CaseStageBars(
+                      counts: {
+                        for (final stage in CaseStage.values)
+                          stage: items
+                              .where((item) => item.stage == stage)
+                              .length,
+                      },
+                    ),
+                  ],
                 ),
-              );
-            }).toList(),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: CaseStage.values.map((stage) {
+                  final count = items
+                      .where((item) => item.stage == stage)
+                      .length;
+                  return SizedBox(
+                    width: 170,
+                    child: AppCard(
+                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$count',
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
+                          const SizedBox(height: 4),
+                          StatusChip.forStage(stage),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 22),
